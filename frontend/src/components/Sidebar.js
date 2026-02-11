@@ -16,7 +16,7 @@ function Sidebar() {
 
   return (
     <div className="sidebar">
-      <h2>WSS</h2>
+      <h2>VV Hospital</h2>
 
       <ul>
         <li>
