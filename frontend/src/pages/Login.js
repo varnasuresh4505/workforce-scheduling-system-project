@@ -12,7 +12,7 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError(""); // reset error
+    setError("");
 
     try {
       const res = await axios.post("http://localhost:5000/api/auth/login", {
@@ -20,18 +20,9 @@ function Login() {
         password,
       });
 
-      // Save user info in localStorage
       localStorage.setItem("userInfo", JSON.stringify(res.data));
-
-      // Navigate based on role
-      if (res.data.role === "admin") {
-        navigate("/dashboard");
-      } else {
-        navigate("/dashboard"); // or a separate employee dashboard
-      }
-
+      navigate("/dashboard");
     } catch (err) {
-      console.error(err);
       setError(err.response?.data?.message || "Login failed");
     }
   };
@@ -43,12 +34,7 @@ function Login() {
 
       <form onSubmit={handleLogin}>
         <label>Email</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
 
         <label>Password</label>
         <input

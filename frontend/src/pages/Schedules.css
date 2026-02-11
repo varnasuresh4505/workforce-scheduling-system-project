@@ -1,0 +1,47 @@
+.sched-page {
+  padding: 30px;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+.sched-form {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  margin: 15px 0 25px;
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.sched-form select,
+.sched-form input {
+  padding: 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.sched-form button {
+  background: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th {
+  background: #1e293b;
+  color: white;
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}

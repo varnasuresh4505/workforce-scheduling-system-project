@@ -1,0 +1,44 @@
+.planner-grid {
+  display: grid;
+  grid-template-columns: 200px repeat(7, 1fr);
+  border: 1px solid #ccc;
+}
+
+.header-cell {
+  background: #1e293b;
+  color: white;
+  padding: 10px;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+
+.emp-cell {
+  padding: 10px;
+  border: 1px solid #ccc;
+  font-weight: bold;
+}
+
+.day-cell {
+  border: 1px solid #ccc;
+  min-height: 60px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.shift-box {
+  background: #3b82f6;
+  color: white;
+  padding: 4px;
+  margin-bottom: 4px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

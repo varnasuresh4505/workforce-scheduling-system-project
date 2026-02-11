@@ -1,0 +1,45 @@
+.shifts-container {
+  padding: 30px;
+}
+
+.shift-form {
+  display: flex;
+  gap: 10px;
+  margin: 15px 0 20px 0;
+}
+
+.shift-form select,
+.shift-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.shift-form button {
+  padding: 10px 14px;
+  background: #1e293b;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.shift-form button:hover {
+  background: #334155;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #1e293b;
+  color: white;
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+}

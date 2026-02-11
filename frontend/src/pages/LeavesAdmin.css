@@ -1,0 +1,49 @@
+.admin-leaves {
+  padding: 30px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #1e293b;
+  color: white;
+  padding: 12px;
+}
+
+td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  vertical-align: top;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.approve {
+  background: #16a34a;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.reject {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.status.pending { color: #b45309; font-weight: 700; }
+.status.approved { color: #15803d; font-weight: 700; }
+.status.rejected { color: #b91c1c; font-weight: 700; }
+
+small { color: gray; }

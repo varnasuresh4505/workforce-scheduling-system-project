@@ -1,0 +1,13 @@
+.emp-container {
+  padding: 40px;
+  background: #f4f6f8;
+  min-height: 100vh;
+}
+
+.emp-card {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.1);
+}

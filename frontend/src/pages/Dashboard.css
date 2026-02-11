@@ -4,13 +4,11 @@ body {
   background-color: #f4f6f8;
 }
 
-/* Layout */
 .dashboard {
   display: flex;
   height: 100vh;
 }
 
-/* Sidebar */
 .sidebar {
   width: 220px;
   background-color: #1e293b;
@@ -39,13 +37,11 @@ body {
   background-color: #334155;
 }
 
-/* Main Content */
 .main-content {
   flex: 1;
   padding: 30px;
 }
 
-/* Top Bar */
 .topbar {
   display: flex;
   justify-content: space-between;
@@ -56,7 +52,6 @@ body {
   margin: 0;
 }
 
-/* Cards */
 .card-container {
   display: flex;
   gap: 20px;
@@ -77,4 +72,31 @@ body {
 .card p {
   font-size: 22px;
   font-weight: bold;
+}
+
+.section {
+  margin-top: 30px;
+}
+
+.section h2 {
+  margin-bottom: 12px;
+}
+
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.dash-table th {
+  background: #1e293b;
+  color: white;
+  padding: 12px;
+}
+
+.dash-table td {
+  padding: 10px;
+  border: 1px solid #ddd;
 }
