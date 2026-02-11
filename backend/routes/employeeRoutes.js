@@ -11,7 +11,7 @@ const {
 const { protect } = require("../middleware/authMiddleware");
 const { isAdmin } = require("../middleware/adminMiddleware");
 
-// Admin-only routes
+// Admin only
 router.post("/", protect, isAdmin, addEmployee);
 router.get("/", protect, isAdmin, getEmployees);
 router.put("/:id", protect, isAdmin, updateEmployee);

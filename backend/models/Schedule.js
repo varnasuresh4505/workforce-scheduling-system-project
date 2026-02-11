@@ -2,27 +2,17 @@ const mongoose = require("mongoose");
 
 const scheduleSchema = new mongoose.Schema(
   {
-    employee: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",   // ✅ changed
-      required: true
-    },
+    employee: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 
-    date: {
-      type: Date,
-      required: true
-    },
+    employeeId: { type: String, required: true },
+    employeeName: { type: String, required: true },
 
-    shift: {
-      type: String,
-      enum: ["Morning", "Evening", "Night"],
-      required: true
-    },
+    date: { type: Date, required: true },
 
-    assignedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User"
-    }
+    fromTime: { type: String, required: true }, // "10:00"
+    toTime: { type: String, required: true },   // "17:00"
+
+    assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }
 );

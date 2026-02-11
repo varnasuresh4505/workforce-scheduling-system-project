@@ -1,45 +1,69 @@
 const Shift = require("../models/Shift");
 
-// ➕ Assign shift (Admin only)
+// ✅ Helper: "HH:mm" -> minutes
+const toMinutes = (t) => {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
+};
+
+// ✅ Create Shift with overlap check
 exports.createShift = async (req, res) => {
   try {
     const { employeeId, date, startTime, endTime } = req.body;
 
-    // ❗ Prevent overlapping shift
-    const existingShift = await Shift.findOne({
+    if (!employeeId || !date || !startTime || !endTime) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const start = toMinutes(startTime);
+    const end = toMinutes(endTime);
+
+    if (end <= start) {
+      return res.status(400).json({ message: "End time must be after start time" });
+    }
+
+    const shiftDate = new Date(date);
+    shiftDate.setHours(0, 0, 0, 0);
+
+    const existingShifts = await Shift.find({
       employee: employeeId,
-      date,
-      startTime
+      date: shiftDate,
     });
 
-    if (existingShift) {
+    const isOverlapping = existingShifts.some((s) => {
+      const oldStart = toMinutes(s.startTime);
+      const oldEnd = toMinutes(s.endTime);
+      return start < oldEnd && end > oldStart;
+    });
+
+    if (isOverlapping) {
       return res.status(400).json({
-        message: "Shift already assigned for this time"
+        message: "Shift time overlaps with an existing shift for this employee",
       });
     }
 
     const shift = await Shift.create({
       employee: employeeId,
-      date,
+      date: shiftDate,
       startTime,
-      endTime
+      endTime,
     });
 
-    res.status(201).json(shift);
+    return res.status(201).json(shift);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };
 
-// 📋 Get all shifts
+// ✅ Get all shifts
 exports.getShifts = async (req, res) => {
   try {
     const shifts = await Shift.find()
       .populate("employee", "name email")
       .sort({ date: 1 });
 
-    res.json(shifts);
+    return res.json(shifts);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    return res.status(500).json({ message: error.message });
   }
 };

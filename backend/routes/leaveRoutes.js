@@ -4,19 +4,19 @@ const router = express.Router();
 const {
   applyLeave,
   getAllLeaves,
-  updateLeaveStatus
+  updateLeaveStatus,
+  getMyLeaves,
 } = require("../controllers/leaveController");
 
 const { protect } = require("../middleware/authMiddleware");
 const { isAdmin } = require("../middleware/adminMiddleware");
 
-// Employee applies leave
+// Employee
 router.post("/", protect, applyLeave);
+router.get("/my", protect, getMyLeaves);
 
-// Admin views all leave requests
+// Admin
 router.get("/", protect, isAdmin, getAllLeaves);
-
-// Admin approves/rejects leave
 router.put("/:id", protect, isAdmin, updateLeaveStatus);
 
 module.exports = router;
