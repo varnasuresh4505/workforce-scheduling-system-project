@@ -1,12 +1,16 @@
 const Schedule = require("../models/Schedule");
 const Shift = require("../models/Shift");
 const User = require("../models/User");
+const Leave = require("../models/Leave");
 
 // helper: "HH:mm" -> minutes
 const toMinutes = (t) => {
   const [h, m] = t.split(":").map(Number);
   return h * 60 + m;
 };
+
+// helper: overlap check
+const overlaps = (startA, endA, startB, endB) => startA < endB && endA > startB;
 
 // ✅ Admin creates schedule -> also creates Shift (planner updates)
 exports.createSchedule = async (req, res) => {
@@ -27,7 +31,27 @@ exports.createSchedule = async (req, res) => {
     const scheduleDate = new Date(date);
     scheduleDate.setHours(0, 0, 0, 0);
 
-    // ✅ Schedule overlap check
+    // ✅ 1) BLOCK if approved leave overlaps (main change)
+    const approvedLeaves = await Leave.find({
+      employee: emp._id,
+      status: { $in: ["approved", "Approved"] }, // supports both
+      fromDate: { $lte: scheduleDate },
+      toDate: { $gte: scheduleDate },
+    });
+
+    const leaveConflict = approvedLeaves.some((lv) => {
+      const leaveStart = toMinutes(lv.startTime);
+      const leaveEnd = toMinutes(lv.endTime);
+      return overlaps(start, end, leaveStart, leaveEnd);
+    });
+
+    if (leaveConflict) {
+      return res.status(400).json({
+        message: "Cannot create schedule: employee has an approved leave during this time",
+      });
+    }
+
+    // ✅ 2) Schedule overlap check
     const existingSchedules = await Schedule.find({
       employee: emp._id,
       date: scheduleDate,
@@ -36,14 +60,14 @@ exports.createSchedule = async (req, res) => {
     const scheduleOverlap = existingSchedules.some((s) => {
       const oldStart = toMinutes(s.fromTime);
       const oldEnd = toMinutes(s.toTime);
-      return start < oldEnd && end > oldStart;
+      return overlaps(start, end, oldStart, oldEnd);
     });
 
     if (scheduleOverlap) {
       return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
     }
 
-    // ✅ Shift overlap check also (so planner remains safe)
+    // ✅ 3) Shift overlap check (planner safe)
     const existingShifts = await Shift.find({
       employee: emp._id,
       date: scheduleDate,
@@ -52,7 +76,7 @@ exports.createSchedule = async (req, res) => {
     const shiftOverlap = existingShifts.some((s) => {
       const oldStart = toMinutes(s.startTime);
       const oldEnd = toMinutes(s.endTime);
-      return start < oldEnd && end > oldStart;
+      return overlaps(start, end, oldStart, oldEnd);
     });
 
     if (shiftOverlap) {
@@ -99,7 +123,6 @@ exports.getSchedules = async (req, res) => {
   }
 };
 
-// ✅ Employee view own schedules (optional)
 exports.getMySchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find({ employee: req.user._id })
