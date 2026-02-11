@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Employees.css";
+import Layout from "../components/Layout"; 
 
 function Employees() {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -126,6 +127,7 @@ function Employees() {
   });
 
   return (
+    <Layout>
     <div className="emp-page">
       <h2>Employees (Admin)</h2>
 
@@ -162,6 +164,7 @@ function Employees() {
 
           <input type="date" value={form.dob}
             onChange={(e) => setForm({ ...form, dob: e.target.value })} />
+            
 
           <button className="add-btn" onClick={handleAdd}>Add Employee</button>
         </div>
@@ -264,6 +267,7 @@ function Employees() {
         </div>
       )}
     </div>
+    </Layout>
   );
 }
 

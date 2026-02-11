@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Dashboard.css";
+import Layout from "../components/Layout"; // ✅ add this
+import EmployeeDashboard from "./EmployeeDashboard";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -52,34 +54,8 @@ function Dashboard() {
   };
 
   return (
+    <Layout>
     <div className="dashboard">
-      {/* Sidebar */}
-      {/* Sidebar */}
-      <div className="sidebar">
-        <h2>WSS</h2>
-        <ul>
-          <li onClick={() => navigate("/dashboard")}>Dashboard</li>
-
-          {user?.role === "admin" && (
-            <>
-              <li onClick={() => navigate("/employees")}>Employees</li>
-              <li onClick={() => navigate("/shifts")}>Shifts</li>
-              <li onClick={() => navigate("/schedules")}>Schedules</li>
-              <li onClick={() => navigate("/leaves")}>Leave Requests</li>
-            </>
-          )}
-
-          {user?.role === "employee" && (
-            <>
-              <li onClick={() => navigate("/my-schedule")}>My Schedule</li>
-              <li onClick={() => navigate("/apply-leave")}>Apply Leave</li>
-            </>
-          )}
-
-          <li onClick={handleLogout}>Logout</li>
-        </ul>
-      </div>
-
       {/* Main */}
       <div className="main-content">
         <div className="topbar">
@@ -114,18 +90,18 @@ function Dashboard() {
               <table className="dash-table">
                 <thead>
                   <tr>
+                    <th>Employee ID</th>
                     <th>Employee</th>
                     <th>Date</th>
-                    <th>Shift</th>
                     <th>Assigned By</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stats.latestSchedules?.map((s) => (
                     <tr key={s._id}>
+                      <td>{s.employeeId}</td>
                       <td>{s.employee?.name}</td>
                       <td>{new Date(s.date).toLocaleDateString()}</td>
-                      <td>{s.shift}</td>
                       <td>{s.assignedBy?.name || "-"}</td>
                     </tr>
                   ))}
@@ -146,38 +122,12 @@ function Dashboard() {
         {/* Employee Updated Schedule */}
         {user?.role === "employee" && (
           <div className="section">
-            <h2>My Updated Schedules</h2>
-
-            <table className="dash-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Shift</th>
-                  <th>Assigned By</th>
-                </tr>
-              </thead>
-              <tbody>
-                {myLatestSchedules.map((s) => (
-                  <tr key={s._id}>
-                    <td>{new Date(s.date).toLocaleDateString()}</td>
-                    <td>{s.shift}</td>
-                    <td>{s.assignedBy?.name || "-"}</td>
-                  </tr>
-                ))}
-
-                {myLatestSchedules.length === 0 && (
-                  <tr>
-                    <td colSpan="3" style={{ textAlign: "center", padding: "18px" }}>
-                      No schedule assigned yet
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+            <EmployeeDashboard />
           </div>
         )}
       </div>
     </div>
+    </Layout>
   );
 }
 

@@ -99,6 +99,7 @@ function Shifts() {
       <table>
         <thead>
           <tr>
+            <th>Employee ID</th>
             <th>Employee</th>
             <th>Date</th>
             <th>Start</th>
@@ -108,6 +109,7 @@ function Shifts() {
         <tbody>
           {shifts.map((s) => (
             <tr key={s._id}>
+                <td>{s.employeeId}</td>
               <td>{s.employee?.name}</td>
               <td>{new Date(s.date).toLocaleDateString()}</td>
               <td>{s.startTime}</td>

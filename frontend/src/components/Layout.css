@@ -1,0 +1,12 @@
+.layout {
+  display: flex;
+  height: 100vh;   /* use height instead of min-height */
+  overflow: hidden;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 30px;
+  background-color: #f4f6f8;
+  overflow-y: auto;   /* content scroll */
+}

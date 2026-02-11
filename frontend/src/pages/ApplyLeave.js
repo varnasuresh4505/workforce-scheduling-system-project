@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./ApplyLeave.css";
+import Layout from "../components/Layout"; // ✅ add this
 
 function ApplyLeave() {
   const navigate = useNavigate();
@@ -55,6 +56,7 @@ function ApplyLeave() {
   };
 
   return (
+    <Layout>
     <div className="leave-page">
       <h2>Apply Leave</h2>
 
@@ -107,6 +109,7 @@ function ApplyLeave() {
         </tbody>
       </table>
     </div>
+    </Layout>
   );
 }
 

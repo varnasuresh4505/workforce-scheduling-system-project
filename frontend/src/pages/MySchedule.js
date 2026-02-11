@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./MySchedule.css";
+import Layout from "../components/Layout"; // ✅ add this
 
 function MySchedule() {
   const navigate = useNavigate();
@@ -27,6 +28,7 @@ function MySchedule() {
   };
 
   return (
+    <Layout>
     <div className="my-container">
       <h2>My Schedule</h2>
 
@@ -34,7 +36,7 @@ function MySchedule() {
         <thead>
           <tr>
             <th>Date</th>
-            <th>Shift</th>
+            <th>Time</th>
             <th>Assigned By</th>
           </tr>
         </thead>
@@ -43,7 +45,7 @@ function MySchedule() {
           {mySchedules.map((s) => (
             <tr key={s._id}>
               <td>{new Date(s.date).toLocaleDateString()}</td>
-              <td>{s.shift}</td>
+              <td>{s.startTime} - {s.endTime}</td>
               <td>{s.assignedBy?.name || "-"}</td>
             </tr>
           ))}
@@ -58,6 +60,7 @@ function MySchedule() {
         </tbody>
       </table>
     </div>
+    </Layout>
   );
 }
 

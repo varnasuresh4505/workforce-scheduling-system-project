@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./LeavesAdmin.css";
+import Layout from "../components/Layout"; // ✅ add this
 
 function LeavesAdmin() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ function LeavesAdmin() {
   };
 
   return (
+    <Layout>
     <div className="admin-leaves">
       <h2>Leave Requests</h2>
 
@@ -84,6 +86,7 @@ function LeavesAdmin() {
         </tbody>
       </table>
     </div>
+    </Layout>
   );
 }
 

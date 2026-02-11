@@ -1,44 +1,151 @@
-.planner-grid {
-  display: grid;
-  grid-template-columns: 200px repeat(7, 1fr);
-  border: 1px solid #ccc;
+/* Page wrapper */
+.planner-page {
+  padding: 20px;
 }
 
+/* Top actions */
+.planner-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.week-controls {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #f4f6f8;
+  padding: 12px 0;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Buttons style */
+.week-controls button {
+  font-family: "Poppins", sans-serif;
+  padding: 9px 14px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.week-controls button:hover {
+  background: #334155;
+}
+
+/* ✅ MAIN GRID
+   2 fixed columns (Emp ID + Employee) + 7 day columns = 9 columns total
+*/
+.planner-grid {
+  display: grid;
+  grid-template-columns: 140px 220px repeat(7, minmax(140px, 1fr));
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* ✅ IMPORTANT:
+   DO NOT use: .header-cell { grid-column: 1 / -1; }
+   That breaks alignment.
+*/
 .header-cell {
   background: #1e293b;
   color: white;
   padding: 10px;
-  font-weight: bold;
-  border: 1px solid #ccc;
+  font-weight: 700;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.empid-cell,
+.emp-cell,
+.day-cell {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px;
+}
+
+.empid-cell {
+  font-weight: 700;
+  text-align: center;
 }
 
 .emp-cell {
-  padding: 10px;
-  border: 1px solid #ccc;
-  font-weight: bold;
+  font-weight: 600;
 }
 
+/* Day cells (double click target) */
 .day-cell {
-  border: 1px solid #ccc;
   min-height: 60px;
-  padding: 5px;
   cursor: pointer;
 }
 
-.shift-box {
-  background: #3b82f6;
-  color: white;
-  padding: 4px;
-  margin-bottom: 4px;
-  border-radius: 4px;
-  font-size: 12px;
+.day-cell:hover {
+  background: #f8fafc;
 }
 
+/* Shift box inside day cell */
+.shift-box {
+  background: #334155;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal {
+  width: 360px;
+  background: white;
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.modal-time {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-time input {
+  flex: 1;
+  padding: 8px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #1e293b;
+  color: white;
+}
+
+.modal-actions button:hover {
+  background: #334155;
 }

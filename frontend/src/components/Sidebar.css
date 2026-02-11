@@ -1,0 +1,48 @@
+.sidebar {
+  width: 220px;
+  background-color: #1e293b;
+  color: white;
+  padding: 20px;
+
+  height: 100vh;        /* full screen height */
+  overflow-y: auto;     /* ✅ enable vertical scroll */
+  position: sticky;     /* optional but good */
+  top: 0;
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  margin-bottom: 10px;
+}
+
+.side-link {
+  display: block;
+  padding: 12px;
+  border-radius: 6px;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  width: 183px;
+  text-align: left;
+  font-size: 16px;
+}
+
+
+/* ✅ this is the clicked/active item */
+.side-link.active {
+  background-color: #334155;
+  font-weight: bold;
+}
+
