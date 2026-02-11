@@ -8,25 +8,19 @@ table {
   margin-top: 20px;
 }
 
-th {
-  background: #1e293b;
-  color: white;
-  padding: 12px;
-}
-
-td {
+th, td {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
 }
 
-button {
-  background: crimson;
+th {
+  background-color: #f4f4f4;
+}
+
+.delete-btn {
+  background: red;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 5px 10px;
   cursor: pointer;
-}
-
-button:hover {
-  background: darkred;
 }

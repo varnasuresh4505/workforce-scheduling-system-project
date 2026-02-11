@@ -1,34 +1,58 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./Employees.css";
 
 function Employees() {
-  const [employees, setEmployees] = useState([]);
-
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
+  const [employees, setEmployees] = useState([]);
+
   useEffect(() => {
+    if (!user) {
+      navigate("/");
+    }
+
+    if (user.role !== "admin") {
+      navigate("/dashboard");
+    }
+
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
-    const res = await axios.get("http://localhost:5000/api/employees", {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
-    });
+    try {
+      const res = await axios.get(
+        "http://localhost:5000/api/users",
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
 
-    setEmployees(res.data);
+      setEmployees(res.data);
+    } catch (error) {
+      console.error("Error fetching employees");
+    }
   };
 
   const deleteEmployee = async (id) => {
-    await axios.delete(`http://localhost:5000/api/employees/${id}`, {
-      headers: {
-        Authorization: `Bearer ${user.token}`
-      }
-    });
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/users/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${user.token}`
+          }
+        }
+      );
 
-    fetchEmployees();
+      fetchEmployees(); // refresh list
+    } catch (error) {
+      console.error("Error deleting employee");
+    }
   };
 
   return (
@@ -40,7 +64,8 @@ function Employees() {
           <tr>
             <th>Name</th>
             <th>Email</th>
-            <th>Actions</th>
+            <th>Role</th>
+            <th>Action</th>
           </tr>
         </thead>
 
@@ -49,8 +74,12 @@ function Employees() {
             <tr key={emp._id}>
               <td>{emp.name}</td>
               <td>{emp.email}</td>
+              <td>{emp.role}</td>
               <td>
-                <button onClick={() => deleteEmployee(emp._id)}>
+                <button
+                  className="delete-btn"
+                  onClick={() => deleteEmployee(emp._id)}
+                >
                   Delete
                 </button>
               </td>
