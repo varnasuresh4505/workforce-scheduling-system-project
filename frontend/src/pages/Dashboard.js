@@ -1,23 +1,67 @@
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./Dashboard.css";
 
 function Dashboard() {
-  const navigate = useNavigate();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  const logoutHandler = () => {
-    localStorage.removeItem("userInfo");
-    navigate("/");
+  const [stats, setStats] = useState({
+    totalEmployees: 0,
+    totalShifts: 0,
+    totalSchedules: 0
+  });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/dashboard/stats");
+      setStats(response.data);
+    } catch (error) {
+      console.error("Error fetching dashboard data");
+    }
   };
 
-  if (!userInfo) return <p>Loading...</p>;
-
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Dashboard</h2>
-      <h3>Welcome {userInfo.name}</h3>
-      <p>Email: {userInfo.email}</p>
-      <p>Role: {userInfo.role}</p>
-      <button onClick={logoutHandler}>Logout</button>
+    <div className="dashboard">
+
+      <div className="sidebar">
+        <h2>WSS</h2>
+        <ul>
+          <li>Dashboard</li>
+          <li>Employees</li>
+          <li>Shifts</li>
+          <li>Schedule</li>
+          <li>Logout</li>
+        </ul>
+      </div>
+
+      <div className="main-content">
+
+        <div className="topbar">
+          <h1>Admin Dashboard</h1>
+          <div>Welcome, Admin</div>
+        </div>
+
+        <div className="card-container">
+          <div className="card">
+            <h3>Total Employees</h3>
+            <p>{stats.totalEmployees}</p>
+          </div>
+
+          <div className="card">
+            <h3>Total Shifts</h3>
+            <p>{stats.totalShifts}</p>
+          </div>
+
+          <div className="card">
+            <h3>Active Schedules</h3>
+            <p>{stats.totalSchedules}</p>
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
