@@ -26,6 +26,7 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/leaves", leaveRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+
 // Test route
 app.get("/", (req, res) => {
   res.send("Workforce Scheduling System Backend Running");
