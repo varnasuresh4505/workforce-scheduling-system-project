@@ -12,7 +12,7 @@ exports.addEmployee = async (req, res) => {
       gender,
       mobile,
       address,
-      dob
+      dob,
     } = req.body;
 
     if (!name || !employeeId || !email || !password) {
