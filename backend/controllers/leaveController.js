@@ -4,7 +4,7 @@ const Leave = require("../models/Leave");
 exports.applyLeave = async (req, res) => {
   try {
     const leave = await Leave.create({
-      employee: req.body.employee,
+      employee: req.user._id,   // ✅ fixed
       fromDate: req.body.fromDate,
       toDate: req.body.toDate,
       reason: req.body.reason
@@ -20,8 +20,8 @@ exports.applyLeave = async (req, res) => {
 exports.getAllLeaves = async (req, res) => {
   try {
     const leaves = await Leave.find()
-      .populate("employee", "name")
-      .populate("reviewedBy", "name");
+    .populate("employee", "name email")
+    .populate("reviewedBy", "name");
 
     res.json(leaves);
   } catch (error) {

@@ -25,7 +25,7 @@ exports.assignShift = async (req, res) => {
 exports.getSchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find()
-      .populate("employee", "name department")
+      .populate("employee", "name email role")
       .populate("assignedBy", "name");
 
     res.json(schedules);

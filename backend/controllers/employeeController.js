@@ -1,6 +1,5 @@
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
-const Employee = require("../models/Employee");
 
 // ➕ Add Employee (Admin only)
 exports.addEmployee = async (req, res) => {
@@ -12,7 +11,6 @@ exports.addEmployee = async (req, res) => {
       return res.status(400).json({ message: "Employee already exists" });
     }
 
-    // 🔐 Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -28,9 +26,11 @@ exports.addEmployee = async (req, res) => {
       employee: {
         id: employee._id,
         name: employee.name,
-        email: employee.email
+        email: employee.email,
+        role: employee.role
       }
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -51,7 +51,7 @@ exports.updateEmployee = async (req, res) => {
   try {
     const employee = await User.findById(req.params.id);
 
-    if (!employee) {
+    if (!employee || employee.role !== "employee") {
       return res.status(404).json({ message: "Employee not found" });
     }
 
@@ -70,7 +70,7 @@ exports.deleteEmployee = async (req, res) => {
   try {
     const employee = await User.findById(req.params.id);
 
-    if (!employee) {
+    if (!employee || employee.role !== "employee") {
       return res.status(404).json({ message: "Employee not found" });
     }
 

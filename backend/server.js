@@ -9,6 +9,7 @@ const employeeRoutes = require("./routes/employeeRoutes");
 const shiftRoutes = require("./routes/shiftRoutes");
 const scheduleRoutes = require("./routes/scheduleRoutes");
 const leaveRoutes = require("./routes/leaveRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api/employees", employeeRoutes);
 app.use("/api/shifts", shiftRoutes);
 app.use("/api/schedules", scheduleRoutes);
 app.use("/api/leaves", leaveRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 
 // Test route
 app.get("/", (req, res) => {
