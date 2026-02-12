@@ -114,6 +114,7 @@ exports.createSchedule = async (req, res) => {
 exports.getSchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find()
+      
       .populate("assignedBy", "name")
       .sort({ date: 1 });
 

@@ -38,7 +38,7 @@ exports.getMyLeaves = async (req, res) => {
 exports.getAllLeaves = async (req, res) => {
   try {
     const leaves = await Leave.find()
-      .populate("employee", "name email")
+      .populate("employee", "name email employeeId")
       .populate("reviewedBy", "name")
       .sort({ createdAt: -1 });
 
@@ -62,7 +62,7 @@ exports.updateLeaveStatus = async (req, res) => {
       { status, reviewedBy: req.user._id },
       { new: true }
     )
-      .populate("employee", "name email")
+      .populate("employee", "name email employeeId")
       .populate("reviewedBy", "name");
 
     res.json(leave);
