@@ -60,7 +60,7 @@ function Dashboard() {
       <div className="main-content">
         <div className="topbar">
           <h1>{user?.role === "admin" ? "Admin Dashboard" : "Employee Dashboard"}</h1>
-          <div>Welcome, {user?.name}</div>
+          <div>Welcome, {user?.name} !</div>
         </div>
 
         {/* Admin Cards */}

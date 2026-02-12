@@ -1,45 +1,169 @@
-.leave-page {
-  padding: 30px;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+.leavePg {
+  padding: 28px;
+  background: #f4f6f8;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
 }
 
-.leave-form {
+.leaveHeader {
+  margin-bottom: 14px;
+}
+
+.leaveTitle {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.leaveSub {
+  margin: 6px 0 0;
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* Card */
+.leaveCard {
+  background: white;
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.leaveSectionTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+/* Form layout */
+.leaveForm {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 10px;
-  margin: 15px 0 25px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  align-items: end;
 }
 
-.leave-form input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+.leaveField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.leave-form button {
-  background: #1e293b;
-  color: white;
+.leaveFieldFull {
+  grid-column: 1 / -1;
+}
+
+.leaveLabel {
+  font-size: 15px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.leaveInput {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  color: #787a7d;
+  background: #fff;
+}
+
+.leaveInput:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+
+/* Button */
+.leaveBtn {
+  grid-column: 1 / -1;
+  height: 44px;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
-  padding: 10px;
+  background: #0f172a;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-table {
+.leaveBtn:hover {
+  background: #1e293b;
+}
+
+/* Table */
+.leaveTableWrap {
+  overflow-x: auto;
+}
+
+.leaveTable {
   width: 100%;
   border-collapse: collapse;
 }
 
-th {
-  background: #1e293b;
+.leaveTable th {
+  background: #0f172a;
   color: white;
   padding: 12px;
+  text-align: left;
+  font-size: 15px;
 }
 
-td {
+.leaveTable td {
   padding: 10px;
-  border: 1px solid #ddd;
+  border: 1px solid #e5e7eb;
+  font-size: 15px;
+  color: #0f172a;
 }
 
-.status.pending { color: #b45309; font-weight: 700; }
-.status.approved { color: #15803d; font-weight: 700; }
-.status.rejected { color: #b91c1c; font-weight: 700; }
+.leaveReason {
+  max-width: 420px;
+}
+
+.leaveEmpty {
+  text-align: center;
+  padding: 16px;
+  color: #64748b;
+}
+
+/* Status badge */
+.leaveStatus {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: capitalize;
+}
+
+.leaveStatus.pending {
+  background: #ffedd5;
+  color: #b45309;
+}
+
+.leaveStatus.approved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.leaveStatus.rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Responsive */
+@media (max-width: 1000px) {
+  .leaveForm {
+    grid-template-columns: 1fr 1fr;
+  }
+  .leaveFieldFull {
+    grid-column: 1 / -1;
+  }
+}

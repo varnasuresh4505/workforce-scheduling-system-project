@@ -1,47 +1,173 @@
-.sched-page {
-  padding: 30px;
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+
+.vv-sched-page {
+  padding: 26px;
   background: #f4f6f8;
   min-height: 100vh;
+  font-family: "Poppins", sans-serif;
 }
 
-.sched-form {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 10px;
-  margin: 15px 0 25px;
-  background: white;
+.vv-sched-header {
+  margin-bottom: 16px;
+}
+
+.vv-sched-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.vv-sched-subtitle {
+  margin: 6px 0 0;
+  color: #64748b;
+  font-size: 15px;
+}
+
+.vv-sched-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
   padding: 18px;
+  margin-bottom: 18px;
+}
+
+.vv-sched-cardTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.vv-sched-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.vv-sched-field input,
+.vv-sched-field select
+{
+  font-family: 'Poppins',sans-serif;
+  color:#787a7d;
+  
+}
+
+.vv-sched-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.vv-sched-label {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.vv-sched-control {
+  height: 44px;
+  padding: 0 12px;
   border-radius: 10px;
-}
-
-.sched-form select,
-.sched-form input {
-  padding: 10px;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  color: #0f172a;
+  background: #ffffff;
+  transition: 0.2s;
 }
 
-.sched-form button {
-  background: #1e293b;
-  color: white;
+.vv-sched-control:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+
+.vv-sched-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
+
+.vv-sched-btn {
+  height: 44px;
+  padding: 0 18px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
+  background: #0f172a;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.2s;
 }
 
-table {
+.vv-sched-btn:hover {
+  background: #1e293b;
+}
+
+.vv-sched-tableTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.vv-sched-count {
+  font-size: 12px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.vv-sched-tableWrap {
+  overflow-x: auto;
+}
+
+.vv-sched-table {
   width: 100%;
   border-collapse: collapse;
-  background: white;
+  min-width: 760px;
 }
 
-th {
-  background: #1e293b;
-  color: white;
+.vv-sched-table th {
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 600;
   padding: 12px;
+  text-align: left;
+  font-size: 13px;
 }
 
-td {
-  padding: 10px;
-  border: 1px solid #ddd;
+.vv-sched-table td {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+.vv-sched-table tr:nth-child(even) td {
+  background: #f8fafc;
+}
+
+.vv-sched-empty {
+  text-align: center;
+  padding: 18px;
+  color: #64748b;
+}
+
+/* Responsive */
+@media (max-width: 950px) {
+  .vv-sched-form {
+    grid-template-columns: 1fr;
+  }
+
+  .vv-sched-actions {
+    justify-content: stretch;
+  }
+
+  .vv-sched-btn {
+    width: 100%;
+  }
 }

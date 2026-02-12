@@ -1,191 +1,332 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 
-.emp-page {
-  padding: 30px;
+.empadm-page {
+  padding: 28px;
   background: #f4f6f8;
   min-height: 100vh;
+  font-family: "Poppins", sans-serif;
 }
 
-.emp-form-card,
-.emp-table-card {
+.empadm-header {
+  margin-bottom: 14px;
+}
+
+.empadm-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.empadm-subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: #64748b;
+}
+
+/* Add Form Card */
+.empadm-formCard {
   background: white;
   padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0px 3px 14px rgba(0, 0, 0, 0.08);
-  margin-bottom: 18px; 
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e5e7eb;
+  margin-bottom: 16px;
 }
 
-.emp-form-grid {
+.empadm-sectionTitle {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.empadm-formGrid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  margin-top: 10px;
 }
 
-.emp-form-grid input,
-.emp-form-grid select {
-  padding: 10px;
+.empadm-formGrid input,
+.empadm-formGrid select {
+  height: 44px;
+  padding: 0 12px;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 10px;
   outline: none;
-  font-family: 'Poppins', sans-serif; 
+  font-family: "Poppins", sans-serif;
+  color: #787a7d;
+  background: #fff;
 }
 
-.emp-form-grid input,
-.emp-form-grid select,
-.modal-grid input,
-.modal-grid select,
-.search-input {
-  color: #787a7d;   /* or whatever color you want */
-  font-family: 'Poppins', sans-serif;
+.empadm-formGrid input:focus,
+.empadm-formGrid select:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
 }
-.add-btn {
+
+/* Add Button */
+.empadm-addBtn {
   grid-column: span 4;
-  padding: 10px;
+  height: 44px;
   border: none;
   border-radius: 10px;
+  cursor: pointer;
+  background: #0f172a;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.empadm-addBtn:hover {
   background: #1e293b;
-  color: white;
-  cursor: pointer;
 }
 
-.emp-toolbar {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 12px;
+/* Search */
+.empadm-searchRow {
+  margin-bottom: 14px;
+  width:1086px;
 }
 
-.search-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-}
-
-.refresh-btn {
-  padding: 10px 14px;
-  border-radius: 10px;
-  border: none;
-  background: #0ea5e9;
-  color: white;
-  cursor: pointer;
-}
-
-.emp-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.emp-table th {
-  background: #1e293b;
-  color: white;
-  padding: 12px;
-  text-align: left;
-}
-
-.emp-table td {
-  padding: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.delete-btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #ef4444;
-  color: white;
-  cursor: pointer;
-}
-
-.delete-btn:hover {
-  background: #dc2626;
-}
-
-.edit-btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #22c55e;
-  color: white;
-  cursor: pointer;
-}
-.edit-btn:hover { background: #16a34a; }
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.modal-card {
-  background: white;
-  width: 520px;
-  border-radius: 12px;
-  padding: 18px;
-}
-
-.modal-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.modal-grid input,
-.modal-grid select {
-  padding: 10px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-}
-
-.modal-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-  justify-content: flex-end;
-}
-
-.save-btn {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #1e293b;
-  color: white;
-  cursor: pointer;
-}
-.cancel-btn {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  background: #94a3b8;
-  color: white;
-  cursor: pointer;
-}
-
-.search-box {
+.empadm-searchBox {
   position: relative;
-  flex: 1;
+  width: 100%;
 }
 
-.search-icon {
+.empadm-searchIcon {
   position: absolute;
-  left: 12px;
+  left: 14px;
   top: 50%;
   transform: translateY(-50%);
   color: #64748b;
   font-size: 18px;
 }
 
-.search-input {
-  width: 1086px;
-  padding: 10px 10px 10px 38px; /* space for icon */
-  border-radius: 10px;
+.empadm-searchInput {
+  width: 100%;
+  height: 44px;
+  border-radius: 12px;
   border: 1px solid #cbd5e1;
-  font-family: 'Poppins', sans-serif;
-  color:#787a7d;; /* your edited color */
+  padding: 0 14px 0 44px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  color: #0f172a;
+  background: white;
 }
 
+.empadm-searchInput:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
 
+/* Cards list */
+.empadm-cards {
+  display: grid;
+  grid-template-columns: 1fr; /* one row one employee */
+  gap: 14px;
+}
+
+/* Card */
+.empadm-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.08);
+  padding: 18px;
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  gap: 18px;
+  align-items: start;
+  border: 1px solid #e5e7eb;
+  width: 1108px;
+}
+
+.empadm-cardLeft {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  padding-top: 6px;
+}
+
+.empadm-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  background: #f1f5f9;
+}
+
+.empadm-cardRight {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empadm-cardTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.empadm-nameRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.empadm-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.empadm-statusDot {
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.empadm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.empadm-iconBtn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  cursor: pointer;
+  color: #0f172a;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.empadm-iconBtn:hover {
+  background: #eef2ff;
+}
+
+.empadm-dangerBtn:hover {
+  background: #fee2e2;
+  border-color: #fecaca;
+  color: #b91c1c;
+}
+
+/* details grid */
+.empadm-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px 18px;
+}
+
+.empadm-fieldFull {
+  grid-column: 1 / -1;
+}
+
+.empadm-label {
+  font-size: 12px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.empadm-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* empty */
+.empadm-empty {
+  padding: 16px;
+  text-align: center;
+  color: #64748b;
+  background: white;
+  border: 1px dashed #cbd5e1;
+  border-radius: 14px;
+}
+
+/* Modal */
+.empadm-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.empadm-modalCard {
+  background: white;
+  width: 560px;
+  border-radius: 14px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+}
+
+.empadm-modalGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.empadm-modalGrid input,
+.empadm-modalGrid select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+}
+
+.empadm-modalActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+.empadm-saveBtn {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.empadm-cancelBtn {
+  height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 10px;
+  background: #94a3b8;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* responsive */
+@media (max-width: 1000px) {
+  .empadm-formGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .empadm-addBtn {
+    grid-column: span 2;
+  }
+  .empadm-card {
+    grid-template-columns: 1fr;
+  }
+  .empadm-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./ApplyLeave.css";
-import Layout from "../components/Layout"; // ✅ add this
+import Layout from "../components/Layout";
 
 function ApplyLeave() {
   const navigate = useNavigate();
@@ -21,16 +21,19 @@ function ApplyLeave() {
   useEffect(() => {
     if (!user) return navigate("/");
     if (user.role !== "employee") return navigate("/dashboard");
-
     fetchMyLeaves();
     // eslint-disable-next-line
   }, []);
 
   const fetchMyLeaves = async () => {
-    const res = await axios.get("http://localhost:5000/api/leaves/my", {
-      headers: { Authorization: `Bearer ${user.token}` },
-    });
-    setMyLeaves(res.data);
+    try {
+      const res = await axios.get("http://localhost:5000/api/leaves/my", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
+      setMyLeaves(res.data);
+    } catch (err) {
+      alert("Failed to load leave data");
+    }
   };
 
   const applyLeave = async (e) => {
@@ -56,67 +59,136 @@ function ApplyLeave() {
   };
 
   const formatTime = (time) => {
-  const [hour, minute] = time.split(":");
-  const h = parseInt(hour);
-  const ampm = h >= 12 ? "PM" : "AM";
-  const formattedHour = h % 12 || 12;
-  return `${formattedHour}:${minute} ${ampm}`;
-};
+    if (!time) return "-";
+    const [hour, minute] = time.split(":");
+    const h = parseInt(hour, 10);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const formattedHour = h % 12 || 12;
+    return `${formattedHour}:${minute} ${ampm}`;
+  };
+
+  const formatStatus = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "-");
 
   return (
     <Layout>
-    <div className="leave-page">
-      <h2>Apply Leave</h2>
+      <div className="leavePg">
+        <div className="leaveHeader">
+          <h2 className="leaveTitle">Apply Leave</h2>
+          <p className="leaveSub">Select dates, time range, and submit your reason</p>
+        </div>
 
-      <form className="leave-form" onSubmit={applyLeave}>
-        <input type="date" value={form.fromDate}
-          onChange={(e) => setForm({ ...form, fromDate: e.target.value })} required />
+        {/* Form Card */}
+        <div className="leaveCard">
+          <h3 className="leaveSectionTitle">Leave Form</h3>
 
-        <input type="date" value={form.toDate}
-          onChange={(e) => setForm({ ...form, toDate: e.target.value })} required />
+          <form className="leaveForm" onSubmit={applyLeave}>
+            <div className="leaveField">
+              <label className="leaveLabel">From Date</label>
+              <input
+                className="leaveInput"
+                type="date"
+                value={form.fromDate}
+                onChange={(e) => setForm({ ...form, fromDate: e.target.value })}
+                required
+              />
+            </div>
 
-        <input type="time" value={form.startTime}
-          onChange={(e) => setForm({ ...form, startTime: e.target.value })} required />
+            <div className="leaveField">
+              <label className="leaveLabel">To Date</label>
+              <input
+                className="leaveInput"
+                type="date"
+                value={form.toDate}
+                onChange={(e) => setForm({ ...form, toDate: e.target.value })}
+                required
+              />
+            </div>
 
-        <input type="time" value={form.endTime}
-          onChange={(e) => setForm({ ...form, endTime: e.target.value })} required />
+            <div className="leaveField">
+              <label className="leaveLabel">Start Time</label>
+              <input
+                className="leaveInput"
+                type="time"
+                value={form.startTime}
+                onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                required
+              />
+            </div>
 
-        <input type="text" placeholder="Reason"
-          value={form.reason}
-          onChange={(e) => setForm({ ...form, reason: e.target.value })} required />
+            <div className="leaveField">
+              <label className="leaveLabel">End Time</label>
+              <input
+                className="leaveInput"
+                type="time"
+                value={form.endTime}
+                onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                required
+              />
+            </div>
 
-        <button type="submit">Submit Leave</button>
-      </form>
+            <div className="leaveField leaveFieldFull">
+              <label className="leaveLabel">Reason</label>
+              <input
+                className="leaveInput"
+                type="text"
+                value={form.reason}
+                onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                placeholder="Explain briefly (e.g., medical, personal)"
+                required
+              />
+            </div>
 
-      <h3>My Leave Status</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>From</th>
-            <th>To</th>
-            <th>Time</th>
-            <th>Reason</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {myLeaves.map((l) => (
-            <tr key={l._id}> 
-              <td>{new Date(l.fromDate).toLocaleDateString()}</td>
-              <td>{new Date(l.toDate).toLocaleDateString()}</td>
-              <td>{formatTime(l.startTime)} - {formatTime(l.endTime)}</td>
-              <td>{l.reason}</td>
-              <td className={`status ${l.status}`}>{l.status}</td>
-            </tr>
-          ))}
-          {myLeaves.length === 0 && (
-            <tr>
-              <td colSpan="5" style={{ textAlign: "center" }}>No leave requests</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+            <button className="leaveBtn" type="submit">
+              Submit Leave
+            </button>
+          </form>
+        </div>
+
+        {/* Table Card */}
+        <div className="leaveCard">
+          <h3 className="leaveSectionTitle">My Leave Status</h3>
+
+          <div className="leaveTableWrap">
+            <table className="leaveTable">
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Time</th>
+                  <th>Reason</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {myLeaves.map((l) => (
+                  <tr key={l._id}>
+                    <td>{new Date(l.fromDate).toLocaleDateString()}</td>
+                    <td>{new Date(l.toDate).toLocaleDateString()}</td>
+                    <td>
+                      {formatTime(l.startTime)} - {formatTime(l.endTime)}
+                    </td>
+                    <td className="leaveReason">{l.reason}</td>
+                    <td>
+                      <span className={`leaveStatus ${l.status}`}>
+                        {formatStatus(l.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+
+                {myLeaves.length === 0 && (
+                  <tr>
+                    <td colSpan="5" className="leaveEmpty">
+                      No leave requests
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
     </Layout>
   );
 }
