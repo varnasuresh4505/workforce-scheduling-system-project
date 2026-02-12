@@ -73,6 +73,15 @@ function Schedules() {
     }
   };
 
+  const formatTime = (time) => {
+  if (!time) return "-";
+  const [hour, minute] = time.split(":");
+  const h = parseInt(hour, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const formattedHour = h % 12 || 12;
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
   return (
     <Layout>
       <div className="sched-page">
@@ -115,7 +124,7 @@ function Schedules() {
                 <td>{s.employeeName}</td>
                 <td>{new Date(s.date).toLocaleDateString()}</td>
                 <td>
-                  {s.fromTime} - {s.toTime}
+                  {formatTime(s.fromTime)} - {formatTime(s.toTime)}
                 </td>
                 <td>{s.assignedBy?.name || "-"}</td>
               </tr>

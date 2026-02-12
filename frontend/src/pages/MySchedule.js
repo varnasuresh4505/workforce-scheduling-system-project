@@ -27,6 +27,14 @@ function MySchedule() {
     }
   };
 
+  const formatTime = (time) => {
+  const [hour, minute] = time.split(":");
+  const h = parseInt(hour);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const formattedHour = h % 12 || 12;
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
   return (
     <Layout>
     <div className="my-container">
@@ -45,7 +53,7 @@ function MySchedule() {
           {mySchedules.map((s) => (
             <tr key={s._id}>
               <td>{new Date(s.date).toLocaleDateString()}</td>
-              <td>{s.startTime} - {s.endTime}</td>
+              <td>{formatTime(s.fromTime)} - {formatTime(s.toTime)}</td>
               <td>{s.assignedBy?.name || "-"}</td>
             </tr>
           ))}

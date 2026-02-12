@@ -38,6 +38,15 @@ function LeavesAdmin() {
     }
   };
 
+  const formatTime = (time) => {
+  if (!time) return "-";
+  const [hour, minute] = time.split(":");
+  const h = parseInt(hour, 10);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const formattedHour = h % 12 || 12;
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
   return (
     <Layout>
     <div className="admin-leaves">
@@ -46,9 +55,10 @@ function LeavesAdmin() {
       <table>
         <thead>
           <tr>
+            <th>Emp ID</th>
             <th>Employee</th>
-            <th>From</th>
-            <th>To</th>
+            <th>From Date</th>
+            <th>To Date</th>
             <th>Time</th>
             <th>Reason</th>
             <th>Status</th>
@@ -59,10 +69,11 @@ function LeavesAdmin() {
         <tbody>
           {leaves.map((l) => (
             <tr key={l._id}>
+              <td>{l.employee?.employeeId}</td>
               <td>{l.employee?.name} <br /><small>{l.employee?.email}</small></td>
               <td>{new Date(l.fromDate).toLocaleDateString()}</td>
               <td>{new Date(l.toDate).toLocaleDateString()}</td>
-              <td>{l.startTime} - {l.endTime}</td>
+              <td>{formatTime(l.startTime)} - {formatTime(l.endTime)}</td>
               <td>{l.reason}</td>
               <td className={`status ${l.status}`}>{l.status}</td>
               <td className="actions">

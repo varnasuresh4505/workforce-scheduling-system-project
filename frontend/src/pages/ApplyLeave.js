@@ -55,6 +55,14 @@ function ApplyLeave() {
     }
   };
 
+  const formatTime = (time) => {
+  const [hour, minute] = time.split(":");
+  const h = parseInt(hour);
+  const ampm = h >= 12 ? "PM" : "AM";
+  const formattedHour = h % 12 || 12;
+  return `${formattedHour}:${minute} ${ampm}`;
+};
+
   return (
     <Layout>
     <div className="leave-page">
@@ -93,10 +101,10 @@ function ApplyLeave() {
         </thead>
         <tbody>
           {myLeaves.map((l) => (
-            <tr key={l._id}>
+            <tr key={l._id}> 
               <td>{new Date(l.fromDate).toLocaleDateString()}</td>
               <td>{new Date(l.toDate).toLocaleDateString()}</td>
-              <td>{l.startTime} - {l.endTime}</td>
+              <td>{formatTime(l.startTime)} - {formatTime(l.endTime)}</td>
               <td>{l.reason}</td>
               <td className={`status ${l.status}`}>{l.status}</td>
             </tr>

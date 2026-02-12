@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./Employees.css";
 import Layout from "../components/Layout"; 
+import { FiSearch } from "react-icons/fi";
 
 function Employees() {
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -161,24 +162,34 @@ function Employees() {
 
           <input placeholder="Address" value={form.address}
             onChange={(e) => setForm({ ...form, address: e.target.value })} />
-
-          <input type="date" value={form.dob}
-            onChange={(e) => setForm({ ...form, dob: e.target.value })} />
-            
-
+        
+          <input
+            type="text"
+            placeholder="Date of Birth"
+            onFocus={(e) => (e.target.type = "date")}
+            onBlur={(e) => {
+              if (!e.target.value) e.target.type = "text";
+            }}
+            value={form.dob}
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+          />
+                    
           <button className="add-btn" onClick={handleAdd}>Add Employee</button>
         </div>
       </div>
 
       {/* Search */}
       <div className="emp-toolbar">
+        <div className="search-box">
+        <FiSearch className="search-icon" />
         <input
           className="search-input"
-          placeholder="Search name / employeeId / email..."
+          placeholder=" Search name / employeeId / email..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button className="refresh-btn" onClick={fetchEmployees}>Refresh</button>
+        </div>
+        
       </div>
 
       {/* List */}

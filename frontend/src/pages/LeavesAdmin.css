@@ -19,9 +19,13 @@ td {
   vertical-align: top;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
+
+.actions{
+  display:flex;
+  gap:8px;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
 }
 
 .approve {

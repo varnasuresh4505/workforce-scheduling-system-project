@@ -1,9 +1,10 @@
+
+
 .sidebar {
   width: 220px;
   background-color: #1e293b;
   color: white;
   padding: 20px;
-
   height: 100vh;        /* full screen height */
   overflow-y: auto;     /* ✅ enable vertical scroll */
   position: sticky;     /* optional but good */
@@ -45,4 +46,26 @@
   background-color: #334155;
   font-weight: bold;
 }
+
+.side-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.side-icon {
+  font-size: 20px;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 30px;
+  font-weight: 600;
+}
+
+
+
+
 

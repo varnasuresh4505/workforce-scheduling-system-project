@@ -117,6 +117,34 @@ function ShiftsPlanner() {
     return d.toLocaleDateString(undefined, options);
   };
 
+  const formatTime = (time) => {
+  if (!time) return "-";
+
+  const t = String(time).trim();
+
+  // If backend already sent AM/PM, just normalize the casing and spacing
+  if (/am|pm/i.test(t)) {
+    return t
+      .replace(/\s+/g, " ")
+      .replace(/am/i, "AM")
+      .replace(/pm/i, "PM");
+  }
+
+  // Accept "HH:mm" or "HH:mm:ss"
+  const parts = t.split(":");
+  if (parts.length < 2) return t;
+
+  const h = parseInt(parts[0], 10);
+  const m = parts[1];
+
+  if (Number.isNaN(h)) return t;
+
+  const ampm = h >= 12 ? "PM" : "AM";
+  const hour12 = h % 12 || 12;
+
+  return `${hour12}:${m} ${ampm}`;
+};
+
   return (
     <Layout>
       <div className="planner-page">
@@ -166,7 +194,7 @@ function ShiftsPlanner() {
                   >
                     {cellShifts.map((s) => (
                       <div key={s._id} className="shift-box">
-                        {s.startTime} - {s.endTime}
+                        {formatTime(s.startTime)} - {formatTime(s.endTime)}
                       </div>
                     ))}
                   </div>
