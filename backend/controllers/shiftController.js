@@ -22,9 +22,11 @@ exports.createShift = async (req, res) => {
       return res.status(400).json({ message: "End time must be after start time" });
     }
 
-    const shiftDate = new Date(date);
-    shiftDate.setHours(0, 0, 0, 0);
-
+    const shiftDate = (ymd) => {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0); // local midnight
+};
+  
     const existingShifts = await Shift.find({
       employee: employeeId,
       date: shiftDate,

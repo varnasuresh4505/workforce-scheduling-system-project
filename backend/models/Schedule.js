@@ -7,6 +7,10 @@ const scheduleSchema = new mongoose.Schema(
     employeeId: { type: String, required: true },
     employeeName: { type: String, required: true },
 
+    // ✅ Hospital fields stored in schedule snapshot
+    department: { type: String, default: "" },
+    designation: { type: String, default: "" },
+
     date: { type: Date, required: true },
 
     fromTime: { type: String, required: true }, // "10:00"
