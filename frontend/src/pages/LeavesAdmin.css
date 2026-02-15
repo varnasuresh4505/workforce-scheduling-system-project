@@ -1,5 +1,13 @@
 .admin-leaves {
   padding: 30px;
+  
+}
+
+.admin-leaves h2{
+  margin-bottom:20px; 
+  font-size:20px; 
+  font-weight:800; 
+  color:#0f172a;
 }
 
 table {
@@ -17,6 +25,7 @@ td {
   padding: 10px;
   border: 1px solid #ddd;
   vertical-align: top;
+  font-size: 15px;
 }
 
 
@@ -37,6 +46,7 @@ td {
   cursor: pointer;
 }
 
+
 .reject {
   background: #dc2626;
   color: white;
@@ -44,6 +54,16 @@ td {
   padding: 6px 10px;
   border-radius: 6px;
   cursor: pointer;
+}
+
+.ui::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 5px;
+  width: 100%;
+  background: linear-gradient(90deg, #0f172a, #16a34a, #0f172a);
 }
 
 .status.pending { color: #b45309; font-weight: 700; }

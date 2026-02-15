@@ -67,6 +67,12 @@ function ApplyLeave() {
     return `${formattedHour}:${minute} ${ampm}`;
   };
 
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const formatDDMMYYYY = (dateValue) => {
+  const d = new Date(dateValue);
+  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+};
+
   const formatStatus = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : "-");
 
   return (
@@ -163,8 +169,8 @@ function ApplyLeave() {
               <tbody>
                 {myLeaves.map((l) => (
                   <tr key={l._id}>
-                    <td>{new Date(l.fromDate).toLocaleDateString()}</td>
-                    <td>{new Date(l.toDate).toLocaleDateString()}</td>
+                    <td>{formatDDMMYYYY(l.fromDate)}</td>
+                    <td>{formatDDMMYYYY(l.toDate)}</td>
                     <td>
                       {formatTime(l.startTime)} - {formatTime(l.endTime)}
                     </td>

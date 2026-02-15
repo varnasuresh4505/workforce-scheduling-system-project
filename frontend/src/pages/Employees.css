@@ -1,108 +1,73 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 
-.empadm-page {
-  padding: 28px;
+.vvEmp-page {
+  height: 100vh;
+  padding: 18px 22px;
   background: #f4f6f8;
-  min-height: 100vh;
   font-family: "Poppins", sans-serif;
+  overflow: hidden;
 }
 
-.empadm-header {
-  margin-bottom: 14px;
+.vvEmp-topRow {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: #f4f6f8;
+  padding: 8px 0 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.empadm-title {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  color: #0f172a;
+.vvEmp-title {
+  margin:0; 
+  font-size:20px; 
+  font-weight:800; 
+  color:#0f172a;
 }
 
-.empadm-subtitle {
-  margin: 6px 0 0;
+.vvEmp-sub {
   font-size: 13px;
   color: #64748b;
+  margin-top: 4px;
 }
 
-/* Add Form Card */
-.empadm-formCard {
-  background: white;
-  padding: 18px;
-  border-radius: 14px;
-  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
-  border: 1px solid #e5e7eb;
-  margin-bottom: 16px;
-}
-
-.empadm-sectionTitle {
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.empadm-formGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-}
-
-.empadm-formGrid input,
-.empadm-formGrid select {
-  height: 44px;
-  padding: 0 12px;
-  border: 1px solid #cbd5e1;
-  border-radius: 10px;
-  outline: none;
-  font-family: "Poppins", sans-serif;
-  color: #787a7d;
-  background: #fff;
-}
-
-.empadm-formGrid input:focus,
-.empadm-formGrid select:focus {
-  border-color: #0f172a;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
-}
-
-/* Add Button */
-.empadm-addBtn {
-  grid-column: span 4;
-  height: 44px;
+.vvEmp-addTopBtn {
+  height: 42px;
   border: none;
   border-radius: 10px;
-  cursor: pointer;
   background: #0f172a;
   color: white;
-  font-weight: 600;
-  transition: 0.2s;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0 14px;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
 }
 
-.empadm-addBtn:hover {
-  background: #1e293b;
+.vvEmp-searchRow {
+  position: sticky;
+  top: 62px;
+  z-index: 40;
+  background: #f4f6f8;
+  padding: 0 0 12px;
 }
 
-/* Search */
-.empadm-searchRow {
-  margin-bottom: 14px;
-  width:1086px;
+.vvEmp-searchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: sticky;
 }
 
-.empadm-searchBox {
-  position: relative;
-  width: 100%;
-}
-
-.empadm-searchIcon {
+.vvEmp-searchIcon {
   position: absolute;
-  left: 14px;
-  top: 50%;
-  transform: translateY(-50%);
+  margin-left: 14px;
   color: #64748b;
-  font-size: 18px;
 }
 
-.empadm-searchInput {
+.vvEmp-searchInput {
   width: 100%;
   height: 44px;
   border-radius: 12px;
@@ -110,44 +75,44 @@
   padding: 0 14px 0 44px;
   outline: none;
   font-family: "Poppins", sans-serif;
-  color: #0f172a;
   background: white;
 }
 
-.empadm-searchInput:focus {
+.vvEmp-searchInput:focus {
   border-color: #0f172a;
   box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
 }
 
-/* Cards list */
-.empadm-cards {
-  display: grid;
-  grid-template-columns: 1fr; /* one row one employee */
-  gap: 14px;
-}
+.vvEmp-scrollArea {
+  height: calc(100vh - 140px);
+  overflow: auto;
+  padding-right: 2px;
 
-/* Card */
-.empadm-card {
+  scrollbar-width: none;
+}
+.vvEmp-scrollArea::-webkit-scrollbar { width: 0px; height: 0px; }
+
+.vvEmp-card {
   background: #ffffff;
   border-radius: 14px;
   box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.08);
   padding: 18px;
   display: grid;
   grid-template-columns: 140px 1fr;
-  gap: 18px;
+  gap: 30px;
   align-items: start;
   border: 1px solid #e5e7eb;
-  width: 1108px;
+  margin-bottom: 14px;
 }
 
-.empadm-cardLeft {
+.vvEmp-cardLeft {
   display: flex;
   justify-content: center;
   align-items: start;
-  padding-top: 6px;
+  padding-top: 10px;
 }
 
-.empadm-avatar {
+.vvEmp-avatar {
   width: 120px;
   height: 120px;
   border-radius: 12px;
@@ -156,31 +121,31 @@
   background: #f1f5f9;
 }
 
-.empadm-cardRight {
+.vvEmp-cardRight {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.empadm-cardTop {
+.vvEmp-cardTop {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.empadm-nameRow {
+.vvEmp-nameRow {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.empadm-name {
+.vvEmp-name {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0f172a;
 }
 
-.empadm-statusDot {
+.vvEmp-dot {
   width: 10px;
   height: 10px;
   background: #22c55e;
@@ -189,59 +154,56 @@
   box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
 }
 
-.empadm-actions {
-  display: flex;
-  gap: 8px;
-}
+.vvEmp-actions { display: flex; gap: 8px; }
 
-.empadm-iconBtn {
+.vvEmp-iconBtn {
   width: 34px;
   height: 34px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background: #f8fafc;
   cursor: pointer;
-  color: #0f172a;
   display: grid;
   place-items: center;
-  font-size: 16px;
 }
+.vvEmp-iconBtn:hover { background: #eef2ff; }
+.vvEmp-iconBtn.danger:hover { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
 
-.empadm-iconBtn:hover {
-  background: #eef2ff;
-}
-
-.empadm-dangerBtn:hover {
-  background: #fee2e2;
-  border-color: #fecaca;
-  color: #b91c1c;
-}
-
-/* details grid */
-.empadm-grid {
+.vvEmp-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 14px 18px;
+  gap: 20px 18px;
 }
 
-.empadm-fieldFull {
-  grid-column: 1 / -1;
+
+.vvEmp-page input[type="date"] {
+  color: #797a7b;
 }
 
-.empadm-label {
+.vvEmp-modalGrid select {
+  color:#797a7b;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 10px;
+  font-size: 14px;
+}
+
+.vvEmp-label {
   font-size: 12px;
   color: #64748b;
   margin-bottom: 4px;
+  font-weight: 600;
 }
 
-.empadm-value {
+.vvEmp-value {
   font-size: 14px;
   font-weight: 500;
   color: #0f172a;
 }
 
-/* empty */
-.empadm-empty {
+.vvEmp-field.full { grid-column: 1 / -1; }
+
+.vvEmp-empty {
   padding: 16px;
   text-align: center;
   color: #64748b;
@@ -250,83 +212,72 @@
   border-radius: 14px;
 }
 
-/* Modal */
-.empadm-modalOverlay {
+.vvEmp-modalOverlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(2, 6, 23, 0.45);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 999;
+  align-items: center;
+  z-index: 1500;
 }
 
-.empadm-modalCard {
+.vvEmp-modal {
+  width: 680px;
+  max-width: 94vw;
   background: white;
-  width: 560px;
   border-radius: 14px;
-  padding: 18px;
+  padding: 16px;
   border: 1px solid #e5e7eb;
 }
 
-.empadm-modalGrid {
+.vvEmp-modalTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin-bottom: 10px;
+}
+
+.vvEmp-modalGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 10px;
 }
 
-.empadm-modalGrid input,
-.empadm-modalGrid select {
+.vvEmp-modalGrid input {
   height: 44px;
-  padding: 0 12px;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
+  padding: 0 12px;
   outline: none;
   font-family: "Poppins", sans-serif;
+  
 }
 
-.empadm-modalActions {
+.vvEmp-modalActions {
+  margin-top: 12px;
   display: flex;
   gap: 10px;
-  margin-top: 14px;
   justify-content: flex-end;
 }
 
-.empadm-saveBtn {
+.vvEmp-btn {
   height: 44px;
   padding: 0 14px;
   border: none;
   border-radius: 10px;
-  background: #0f172a;
-  color: white;
   cursor: pointer;
-  font-weight: 600;
-}
-
-.empadm-cancelBtn {
-  height: 44px;
-  padding: 0 14px;
-  border: none;
-  border-radius: 10px;
   background: #94a3b8;
   color: white;
-  cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
 }
 
-/* responsive */
-@media (max-width: 1000px) {
-  .empadm-formGrid {
-    grid-template-columns: 1fr 1fr;
-  }
-  .empadm-addBtn {
-    grid-column: span 2;
-  }
-  .empadm-card {
-    grid-template-columns: 1fr;
-  }
-  .empadm-grid {
-    grid-template-columns: 1fr;
-  }
+.vvEmp-btn.primary {
+  background: #0f172a;
+}
+
+@media (max-width: 980px) {
+  .vvEmp-grid { grid-template-columns: 1fr; }
+  .vvEmp-card { grid-template-columns: 1fr; }
+  .vvEmp-modalGrid { grid-template-columns: 1fr; }
 }

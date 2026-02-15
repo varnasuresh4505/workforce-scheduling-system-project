@@ -1,12 +1,12 @@
 .layout {
   display: flex;
-  height: 100vh;   /* use height instead of min-height */
+  height: 100vh;
   overflow: hidden;
 }
 
 .layout-content {
   flex: 1;
-  padding: 30px;
+  padding: 0;              /* ✅ we will control padding inside pages */
   background-color: #f4f6f8;
-  overflow-y: auto;   /* content scroll */
+  overflow: hidden;        /* ✅ page will decide scroll */
 }

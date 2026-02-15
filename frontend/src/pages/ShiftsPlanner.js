@@ -19,10 +19,7 @@ const addDays = (date, n) => {
   return d;
 };
 
-const ymd = (date) => {
-  const d = new Date(date);
-  return d.toISOString().split("T")[0];
-};
+
 
 function ShiftsPlanner() {
   const navigate = useNavigate();
@@ -145,64 +142,72 @@ function ShiftsPlanner() {
   return `${hour12}:${m} ${ampm}`;
 };
 
+const ymd = (date) => {
+  const d = new Date(date);
+  return d.toISOString().split("T")[0];
+};
+
   return (
     <Layout>
       <div className="planner-page">
-        <div className="planner-top">
-          <h2>Shift Planner</h2>
+  <div className="planner-top">
+    <h2>Shift Planner</h2>
 
-          <div className="week-controls">
-            <button onClick={() => setWeekStart(addDays(weekStart, -7))}>Prev</button>
-            <button onClick={() => setWeekStart(startOfWeek(new Date()))}>This Week</button>
-            <button onClick={() => setWeekStart(addDays(weekStart, 7))}>Next</button>
-          </div>
+    <div className="week-controls">
+      <button onClick={() => setWeekStart(addDays(weekStart, -7))}>Prev</button>
+      <button onClick={() => setWeekStart(startOfWeek(new Date()))}>This Week</button>
+      <button onClick={() => setWeekStart(addDays(weekStart, 7))}>Next</button>
+    </div>
+  </div>
+
+  {/* ✅ ADD THIS WRAPPER */}
+  <div className="planner-gridWrap">
+    <div className="planner-grid">
+      <div className="header-cell">Emp ID</div>
+      <div className="header-cell">Employee</div>
+
+      {days.map((d) => (
+        <div key={ymd(d)} className="header-cell">
+          {formatDayHeader(d)}
         </div>
+      ))}
 
-        <div className="planner-grid">
-          {/* ✅ Header row (9 columns exactly) */}
-          <div className="header-cell">Emp ID</div>
-          <div className="header-cell">Employee</div>
+      {employees.map((emp) => (
+        <React.Fragment key={emp._id}>
+          <div className="empid-cell">{emp.employeeId || "-"}</div>
+          <div className="emp-cell">{emp.name}</div>
 
-          {days.map((d) => (
-            <div key={ymd(d)} className="header-cell">
-              {formatDayHeader(d)}
-            </div>
-          ))}
+          {days.map((d) => {
+            const dayKey = ymd(d);
 
-          {/* ✅ Body rows (9 columns per employee) */}
-          {employees.map((emp) => (
-            <React.Fragment key={emp._id}>
-              <div className="empid-cell">{emp.employeeId || "-"}</div>
-              <div className="emp-cell">{emp.name}</div>
+            const cellShifts = shifts.filter((s) => {
+              const shiftEmpId = s.employee?._id || s.employee;
+              const sameEmp = String(shiftEmpId) === String(emp._id);
+              const sameDay = ymd(s.date) === dayKey;
+              return sameEmp && sameDay;
+            });
 
-              {days.map((d) => {
-                const dayKey = ymd(d);
-
-                const cellShifts = shifts.filter((s) => {
-                  const shiftEmpId = s.employee?._id || s.employee; // supports both populated/unpopulated
-                  const sameEmp = String(shiftEmpId) === String(emp._id);
-                  const sameDay = ymd(s.date) === dayKey;
-                  return sameEmp && sameDay;
-                });
-
-                return (
-                  <div
-                    key={`${emp._id}_${dayKey}`}
-                    className="day-cell"
-                    title="Double click to add shift"
-                    onDoubleClick={() => openModal(emp, d)}
-                  >
-                    {cellShifts.map((s) => (
-                      <div key={s._id} className="shift-box">
-                        {formatTime(s.startTime)} - {formatTime(s.endTime)}
-                      </div>
-                    ))}
+            return (
+              <div
+                key={`${emp._id}_${dayKey}`}
+                className="day-cell"
+                title="Double click to add shift"
+                onDoubleClick={() => openModal(emp, d)}
+              >
+                {cellShifts.map((s) => (
+                  <div key={s._id} className="shift-box">
+                    {formatTime(s.startTime)} - {formatTime(s.endTime)}
                   </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
-        </div>
+                ))}
+              </div>
+            );
+          })}
+        </React.Fragment>
+      ))}
+    </div>
+  </div>
+  </div>
+
 
         {/* Modal */}
         {open && (
@@ -236,6 +241,7 @@ function ShiftsPlanner() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </Layout>
   );

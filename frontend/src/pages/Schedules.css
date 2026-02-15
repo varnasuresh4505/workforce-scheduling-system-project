@@ -1,119 +1,138 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
 
-.vv-sched-page {
+.vvSched-page {
   padding: 26px;
   background: #f4f6f8;
   min-height: 100vh;
   font-family: "Poppins", sans-serif;
 }
 
-.vv-sched-header {
-  margin-bottom: 16px;
+/* ✅ FIXED TOP AREA (Welcome + 3 cards + create button) */
+.vvSched-fixedTop {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: #f4f6f8;
+  padding: 12px 0 14px;
 }
 
-.vv-sched-title {
-  margin: 0;
-  font-size: 22px;
+/* Welcome Row */
+.vvSched-welcomeRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.vvSched-welcomeTitle {
+  margin:0; 
+  font-size:20px; 
+  font-weight:800; 
+  color:#0f172a;
+}
+
+.vvSched-welcomeRight {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: 8px 12px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.vvSched-welcomeText {
+  font-size: 13px;
+  color: #14171b;
+  font-weight: 500;
+}
+
+.vvSched-welcomeName {
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* Cards Row */
+.vvSched-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.vvSched-cardMini {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
+  padding: 14px;
+}
+
+.vvSched-cardLabel {
+  font-size: 12px;
+  color: #64748b;
   font-weight: 600;
+}
+
+.vvSched-cardValue {
+  margin-top: 6px;
+  font-size: 22px;
+  font-weight: 700;
   color: #0f172a;
 }
 
-.vv-sched-subtitle {
-  margin: 6px 0 0;
-  color: #64748b;
-  font-size: 15px;
+/* Create Button Row */
+.vvSched-actionsRow {
+  display: flex;
+  justify-content: flex-end;
 }
 
-.vv-sched-card {
+.vvSched-addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #0f172a;
+  color: white;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.vvSched-addBtn:hover {
+  background: #1e293b;
+  transform: translateY(-1px);
+}
+
+/* ✅ TABLE CARD */
+.vvSched-card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   box-shadow: 0px 6px 18px rgba(15, 23, 42, 0.06);
   padding: 18px;
-  margin-bottom: 18px;
 }
 
-.vv-sched-cardTitle {
-  margin: 0 0 12px;
-  font-size: 16px;
-  font-weight: 600;
-  color: #0f172a;
-}
-
-.vv-sched-form {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-}
-
-.vv-sched-field input,
-.vv-sched-field select
-{
-  font-family: 'Poppins',sans-serif;
-  color:#787a7d;
-  
-}
-
-.vv-sched-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.vv-sched-label {
-  font-size: 14px;
-  color: #475569;
-  font-weight: 500;
-}
-
-.vv-sched-control {
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #cbd5e1;
-  outline: none;
-  font-size: 14px;
-  color: #0f172a;
-  background: #ffffff;
-  transition: 0.2s;
-}
-
-.vv-sched-control:focus {
-  border-color: #0f172a;
-  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
-}
-
-.vv-sched-actions {
-  grid-column: 1 / -1;
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 4px;
-}
-
-.vv-sched-btn {
-  height: 44px;
-  padding: 0 18px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  background: #0f172a;
-  color: #fff;
-  font-weight: 600;
-  transition: 0.2s;
-}
-
-.vv-sched-btn:hover {
-  background: #1e293b;
-}
-
-.vv-sched-tableTop {
+.vvSched-cardHead {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
 
-.vv-sched-count {
+.vvSched-cardTitle {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.vvSched-badge {
   font-size: 12px;
   color: #64748b;
   background: #f1f5f9;
@@ -121,53 +140,230 @@
   border-radius: 999px;
 }
 
-.vv-sched-tableWrap {
-  overflow-x: auto;
+/* ✅ Scroll only inside table (no scrollbar line) */
+.vvSched-tableWrap {
+  max-height: 420px;
+  overflow-y: auto;
+  border-radius: 12px;
 }
 
-.vv-sched-table {
+.vvSched-tableWrap::-webkit-scrollbar {
+  width: 0px;
+}
+.vvSched-tableWrap {
+  scrollbar-width: none;
+}
+
+.vvSched-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 900px;
 }
 
-.vv-sched-table th {
+.vvSched-table th {
   background: #0f172a;
-  color: #ffffff;
+  color: white;
   font-weight: 600;
   padding: 12px;
   text-align: left;
   font-size: 13px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-.vv-sched-table td {
+.vvSched-table td {
   padding: 12px;
   border: 1px solid #e5e7eb;
-  font-size: 13px;
+  font-size: 15px;
   color: #0f172a;
 }
 
-.vv-sched-table tr:nth-child(even) td {
+.vvSched-table tr:nth-child(even) td {
   background: #f8fafc;
 }
 
-.vv-sched-empty {
+.vvSched-empty {
   text-align: center;
   padding: 18px;
   color: #64748b;
 }
 
-/* Responsive */
-@media (max-width: 950px) {
-  .vv-sched-form {
+/* Status */
+.vvSched-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.vvSched-status.active {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.vvSched-status.completed {
+  background: #ffedd5;
+  color: #b45309;
+}
+
+.vvSched-status.inactive {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+/* Modal */
+.vvSched-modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.vvSched-modal {
+  width: 680px;
+  max-width: 92vw;
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0px 20px 60px rgba(15, 23, 42, 0.2);
+}
+
+.vvSched-modalHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.vvSched-closeBtn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+}
+
+.vvSched-closeBtn:hover {
+  background: #eef2ff;
+}
+
+.vvSched-modalGrid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.vvSched-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vvSched-field label {
+  font-size: 13px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.vvSched-field input,
+.vvSched-field select {
+  height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  background: #fff;
+  color: #0f172a;
+}
+
+.vvSched-field input:focus,
+.vvSched-field select:focus {
+  border-color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
+}
+
+.vvSched-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.vvSched-saveBtn {
+  height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: #0f172a;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.vvSched-saveBtn:hover {
+  background: #1e293b;
+}
+
+.vvSched-cancelBtn {
+  height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  background: #94a3b8;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.vvSched-cancelBtn:hover {
+  background: #64748b;
+}
+
+/* Toast */
+.vvToast {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  font-weight: 600;
+  box-shadow: 0px 12px 30px rgba(15, 23, 42, 0.2);
+}
+
+.vvToast.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.vvToast.error {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 900px) {
+  .vvSched-cards {
     grid-template-columns: 1fr;
   }
-
-  .vv-sched-actions {
-    justify-content: stretch;
-  }
-
-  .vv-sched-btn {
-    width: 100%;
+  .vvSched-modalGrid {
+    grid-template-columns: 1fr;
   }
 }

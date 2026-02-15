@@ -2,15 +2,8 @@ import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import { MdDashboard } from "react-icons/md";
-import {
-  FaUsers,
-  FaSignOutAlt,
-  FaCalendarAlt,
-  FaClipboardList,
-  FaClock,
-} from "react-icons/fa";
+import { FaUsers, FaSignOutAlt, FaCalendarAlt, FaClipboardList, FaClock } from "react-icons/fa";
 import { Hospital } from "lucide-react";
-
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -23,27 +16,23 @@ function Sidebar() {
 
   if (!user) return null;
 
-  // ✅ Active link class
-  const linkClass = ({ isActive }) =>
-    isActive ? "side-link active" : "side-link";
+  const linkClass = ({ isActive }) => (isActive ? "side-link active" : "side-link");
 
   return (
     <div className="sidebar">
       <h2 className="sidebar-title">
-        <Hospital size={30} className="logo-icon" />
+        <Hospital size={28} className="logo-icon" />
         VV Hospital
       </h2>
 
       <ul className="sidebar-menu">
-        {/* Dashboard */}
         <li>
-          <NavLink to="/dashboard" className={linkClass}>
-            <MdDashboard className="side-icon" />
+          <NavLink to="/schedules" className={linkClass}>
+            <FaCalendarAlt className="side-icon" />
             <span>Dashboard</span>
           </NavLink>
         </li>
 
-        {/* Admin links */}
         {user?.role === "admin" && (
           <>
             <li>
@@ -53,19 +42,11 @@ function Sidebar() {
               </NavLink>
             </li>
 
-            <li>
-              <NavLink to="/shifts" className={linkClass}>
-                <FaClock className="side-icon" />
-                <span>Shifts</span>
-              </NavLink>
-            </li>
-
-            <li>
+            {/* <li>
               <NavLink to="/schedules" className={linkClass}>
-                <FaCalendarAlt className="side-icon" />
                 <span>Schedules</span>
               </NavLink>
-            </li>
+            </li> */}
 
             <li>
               <NavLink to="/leaves" className={linkClass}>
@@ -73,10 +54,16 @@ function Sidebar() {
                 <span>Leave Requests</span>
               </NavLink>
             </li>
+
+            <li>
+              <NavLink to="/shifts" className={linkClass}>
+                <FaClock className="side-icon" />
+                <span>Shift Planner</span>
+              </NavLink>
+            </li>
           </>
         )}
 
-        {/* Employee links */}
         {user?.role === "employee" && (
           <>
             <li>
@@ -95,7 +82,6 @@ function Sidebar() {
           </>
         )}
 
-        {/* Logout */}
         <li>
           <button className="side-link logout-btn" onClick={handleLogout}>
             <FaSignOutAlt className="side-icon" />
@@ -103,6 +89,10 @@ function Sidebar() {
           </button>
         </li>
       </ul>
+       <div className="sidebar-slogan">
+        <p>💙 Caring Beyond Medicine 💙</p>
+        <small>Healing with Compassion & Trust</small>
+      </div>
     </div>
   );
 }

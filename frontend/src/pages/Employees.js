@@ -1,89 +1,136 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import Popup from "../components/Popup";
 import "./Employees.css";
-import { FiSearch } from "react-icons/fi";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiSearch, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 function Employees() {
+  const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userInfo"));
 
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
 
-  // add form
+  const [pop, setPop] = useState({ open: false, type: "success", message: "" });
+
+  // add modal
+  const [addOpen, setAddOpen] = useState(false);
   const [form, setForm] = useState({
-    name: "",
     employeeId: "",
+    name: "",
+    department: "",
+    designation: "",
+    age: "",
+    dob: "",
+    address: "",
+    mobile: "",
     email: "",
     password: "",
-    gender: "",
-    mobile: "",
-    address: "",
-    dob: "",
   });
 
-  // edit modal
+  // edit modal (optional)
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({
-    name: "",
     employeeId: "",
-    email: "",
-    gender: "",
-    mobile: "",
-    address: "",
+    name: "",
+    department: "",
+    designation: "",
+    age: "",
     dob: "",
+    address: "",
+    mobile: "",
+    email: "",
   });
 
   useEffect(() => {
+    if (!user) return navigate("/");
+    if (user.role !== "admin") return navigate("/dashboard");
     fetchEmployees();
     // eslint-disable-next-line
   }, []);
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employees", {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
+      const res = await axios.get(
+        "http://localhost:5000/api/employees/with-hours",
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        },
+      );
       setEmployees(res.data);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to fetch employees");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to fetch employees",
+      });
     }
   };
 
-  const handleAdd = async () => {
+  const filtered = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    return employees.filter((e) => {
+      return (
+        e.name?.toLowerCase().includes(q) ||
+        e.employeeId?.toLowerCase().includes(q) ||
+        e.email?.toLowerCase().includes(q) ||
+        e.department?.toLowerCase().includes(q) ||
+        e.designation?.toLowerCase().includes(q)
+      );
+    });
+  }, [employees, search]);
+
+  const openAdd = () => {
+    setForm({
+      employeeId: "",
+      name: "",
+      department: "",
+      designation: "",
+      age: "",
+      dob: "",
+      address: "",
+      mobile: "",
+      email: "",
+      password: "",
+    });
+    setAddOpen(true);
+  };
+
+  const addEmployee = async () => {
     try {
       await axios.post("http://localhost:5000/api/employees", form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
-      alert("Employee Added ✅");
-      setForm({
-        name: "",
-        employeeId: "",
-        email: "",
-        password: "",
-        gender: "",
-        mobile: "",
-        address: "",
-        dob: "",
+      setAddOpen(false);
+      setPop({
+        open: true,
+        type: "success",
+        message: "Staff/Employee created successfully ✅",
       });
       fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to add employee");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to add employee",
+      });
     }
   };
 
   const openEdit = (emp) => {
     setEditing(emp);
     setEditForm({
-      name: emp.name || "",
       employeeId: emp.employeeId || "",
-      email: emp.email || "",
-      gender: emp.gender || "",
-      mobile: emp.mobile || "",
-      address: emp.address || "",
+      name: emp.name || "",
+      department: emp.department || "",
+      designation: emp.designation || "",
+      age: emp.age || "",
       dob: emp.dob ? new Date(emp.dob).toISOString().split("T")[0] : "",
+      address: emp.address || "",
+      mobile: emp.mobile || "",
+      email: emp.email || "",
     });
   };
 
@@ -92,165 +139,114 @@ function Employees() {
       await axios.put(
         `http://localhost:5000/api/employees/${editing._id}`,
         editForm,
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        },
       );
-
-      alert("Employee Updated ✅");
       setEditing(null);
+      setPop({
+        open: true,
+        type: "success",
+        message: "Employee updated successfully ✅",
+      });
       fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update employee");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to update employee",
+      });
     }
   };
 
-  const handleDelete = async (id) => {
+  const removeEmployee = async (id) => {
     const ok = window.confirm("Delete this employee?");
     if (!ok) return;
-
     try {
       await axios.delete(`http://localhost:5000/api/employees/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-
-      alert("Employee Deleted ✅");
+      setPop({ open: true, type: "success", message: "Employee deleted ✅" });
       fetchEmployees();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to delete employee");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to delete employee",
+      });
     }
   };
 
-  const filteredEmployees = employees.filter((e) => {
-    const q = search.toLowerCase().trim();
-    return (
-      e.name?.toLowerCase().includes(q) ||
-      e.employeeId?.toLowerCase().includes(q) ||
-      e.email?.toLowerCase().includes(q)
-    );
-  });
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const formatDDMMYYYY = (dateValue) => {
+  const d = new Date(dateValue);
+  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+};
 
   return (
     <Layout>
-      <div className="empadm-page">
-        <div className="empadm-header">
-          <h2 className="empadm-title">Employees Information</h2>
-          <p className="empadm-subtitle">Add, search, update and delete employees</p>
-        </div>
+      <Popup
+        open={pop.open}
+        type={pop.type}
+        message={pop.message}
+        onClose={() => setPop({ ...pop, open: false })}
+      />
 
-        {/* Add Employee */}
-        <div className="empadm-formCard">
-          <h3 className="empadm-sectionTitle">Add Employee</h3>
-
-          <div className="empadm-formGrid">
-            <input
-              placeholder="Employee Name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-
-            <input
-              placeholder="Employee ID"
-              value={form.employeeId}
-              onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
-            />
-
-            <input
-              placeholder="Email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-            />
-
-            <input
-              placeholder="Password"
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-            />
-
-            <select
-              value={form.gender}
-              onChange={(e) => setForm({ ...form, gender: e.target.value })}
-            >
-              <option value="">Gender</option>
-              <option value="Male">Male</option>
-              <option value="Female">Female</option>
-              <option value="Other">Other</option>
-            </select>
-
-            <input
-              placeholder="Mobile"
-              value={form.mobile}
-              onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-            />
-
-            <input
-              placeholder="Address"
-              value={form.address}
-              onChange={(e) => setForm({ ...form, address: e.target.value })}
-            />
-
-            <input
-              type="text"
-              placeholder="Date of Birth"
-              onFocus={(e) => (e.target.type = "date")}
-              onBlur={(e) => {
-                if (!e.target.value) e.target.type = "text";
-              }}
-              value={form.dob}
-              onChange={(e) => setForm({ ...form, dob: e.target.value })}
-            />
-
-            <button className="empadm-addBtn" onClick={handleAdd}>
-              Add Employee
-            </button>
+      <div className="vvEmp-page">
+        {/* fixed header row */}
+        <div className="vvEmp-topRow">
+          <div>
+            <div className="vvEmp-title">Employees</div>
+            <div className="vvEmp-sub">Search and manage hospital staff</div>
           </div>
+
+          <button className="vvEmp-addTopBtn" onClick={openAdd} type="button">
+            <FiPlus /> Add Employee
+          </button>
         </div>
 
-        {/* Search */}
-        <div className="empadm-searchRow">
-          <div className="empadm-searchBox">
-            <FiSearch className="empadm-searchIcon" />
-            <input
-              className="empadm-searchInput"
-              placeholder="Search name / employeeId / email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          </div>
+        {/* fixed search */}
+        <div className="vvEmp-searchRow">
+          <FiSearch className="vvEmp-searchIcon" />
+          <input
+            className="vvEmp-searchInput"
+            placeholder="Search staff id / name / dept / designation / email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
 
-        {/* Cards list */}
-        <div className="empadm-cards">
-          {filteredEmployees.map((u) => (
-            <div key={u._id} className="empadm-card">
-              <div className="empadm-cardLeft">
+        {/* scroll area only for cards */}
+        <div className="vvEmp-scrollArea">
+          {filtered.map((u) => (
+            <div key={u._id} className="vvEmp-card">
+              <div className="vvEmp-cardLeft">
                 <img
-                  className="empadm-avatar"
+                  className="vvEmp-avatar"
                   src={`/photos/${u.employeeId}.png`}
                   onError={(e) => (e.target.src = "/default-profile.png")}
                   alt="Profile"
                 />
               </div>
 
-              <div className="empadm-cardRight">
-                <div className="empadm-cardTop">
-                  <div className="empadm-nameRow">
-                    <div className="empadm-name">{u.name}</div>
-                    <span className="empadm-statusDot" title="Active" />
+              <div className="vvEmp-cardRight">
+                <div className="vvEmp-cardTop">
+                  <div className="vvEmp-nameRow">
+                    <div className="vvEmp-name">{u.name}</div>
+                    <span className="vvEmp-dot" title="Active" />
                   </div>
 
-                  <div className="empadm-actions">
+                  <div className="vvEmp-actions">
                     <button
-                      className="empadm-iconBtn"
+                      className="vvEmp-iconBtn"
                       onClick={() => openEdit(u)}
-                      title="Edit"
                       type="button"
                     >
                       <FiEdit2 />
                     </button>
                     <button
-                      className="empadm-iconBtn empadm-dangerBtn"
-                      onClick={() => handleDelete(u._id)}
-                      title="Delete"
+                      className="vvEmp-iconBtn danger"
+                      onClick={() => removeEmployee(u._id)}
                       type="button"
                     >
                       <FiTrash2 />
@@ -258,107 +254,244 @@ function Employees() {
                   </div>
                 </div>
 
-                <div className="empadm-grid">
-                  <div className="empadm-field">
-                    <div className="empadm-label">Employee ID</div>
-                    <div className="empadm-value">{u.employeeId || "-"}</div>
+                <div className="vvEmp-grid">
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Staff ID</div>
+                    <div className="vvEmp-value">{u.employeeId || "-"}</div>
+                  </div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Staff Name</div>
+                    <div className="vvEmp-value">{u.name || "-"}</div>
                   </div>
 
-                  <div className="empadm-field">
-                    <div className="empadm-label">Email</div>
-                    <div className="empadm-value">{u.email || "-"}</div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Department</div>
+                    <div className="vvEmp-value">{u.department || "-"}</div>
+                  </div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Designation</div>
+                    <div className="vvEmp-value">{u.designation || "-"}</div>
                   </div>
 
-                  <div className="empadm-field">
-                    <div className="empadm-label">Mobile</div>
-                    <div className="empadm-value">{u.mobile || "-"}</div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Email</div>
+                    <div className="vvEmp-value">{u.email || "-"}</div>
                   </div>
-
-                  <div className="empadm-field">
-                    <div className="empadm-label">Gender</div>
-                    <div className="empadm-value">{u.gender || "-"}</div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Contact</div>
+                    <div className="vvEmp-value">{u.mobile || "-"}</div>
                   </div>
-
-                  <div className="empadm-field">
-                    <div className="empadm-label">Date of Birth</div>
-                    <div className="empadm-value">
-                      {u.dob ? new Date(u.dob).toLocaleDateString() : "-"}
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Gender</div>
+                    <div className="vvEmp-value">{u.gender || "-"}</div>
+                  </div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Date of Birth</div>
+                    <div className="vvEmp-value">
+                      {formatDDMMYYYY(u.dob)}
                     </div>
                   </div>
 
-                  <div className="empadm-field empadm-fieldFull">
-                    <div className="empadm-label">Address</div>
-                    <div className="empadm-value">{u.address || "-"}</div>
+                  <div className="vvEmp-field">
+                    <div className="vvEmp-label">Total Hours (This Week)</div>
+                    <div className="vvEmp-value">
+                      {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
+                    </div>
+                  </div>
+
+                  <div className="vvEmp-field full">
+                    <div className="vvEmp-label">Address</div>
+                    <div className="vvEmp-value">{u.address || "-"}</div>
                   </div>
                 </div>
               </div>
             </div>
           ))}
 
-          {filteredEmployees.length === 0 && (
-            <div className="empadm-empty">No employees found</div>
+          {filtered.length === 0 && (
+            <div className="vvEmp-empty">No employees found</div>
           )}
         </div>
 
-        {/* Edit Modal */}
-        {editing && (
-          <div className="empadm-modalOverlay">
-            <div className="empadm-modalCard">
-              <h3 className="empadm-sectionTitle">Edit Employee</h3>
+        {/* ADD MODAL */}
+        {addOpen && (
+          <div className="vvEmp-modalOverlay" onClick={() => setAddOpen(false)}>
+            <div className="vvEmp-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="vvEmp-modalTitle">Add Employee</div>
 
-              <div className="empadm-modalGrid">
+              <div className="vvEmp-modalGrid">
                 <input
-                  value={editForm.name}
-                  placeholder="Name"
-                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder="Staff ID"
+                  value={form.employeeId}
+                  onChange={(e) =>
+                    setForm({ ...form, employeeId: e.target.value })
+                  }
                 />
                 <input
+                  placeholder="Name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                />
+                <input
+                  placeholder="Department"
+                  value={form.department}
+                  onChange={(e) =>
+                    setForm({ ...form, department: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Designation"
+                  value={form.designation}
+                  onChange={(e) =>
+                    setForm({ ...form, designation: e.target.value })
+                  }
+                />
+                <select
+                  value={form.gender}
+                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                <input
+                  type="date"
+                  value={form.dob}
+                  onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                />
+                <input
+                  placeholder="Address"
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm({ ...form, address: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Contact"
+                  value={form.mobile}
+                  onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+                />
+                <input
+                  placeholder="Mail"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="vvEmp-modalActions">
+                <button
+                  className="vvEmp-btn primary"
+                  onClick={addEmployee}
+                  type="button"
+                >
+                  Create
+                </button>
+                <button
+                  className="vvEmp-btn"
+                  onClick={() => setAddOpen(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* EDIT MODAL */}
+        {editing && (
+          <div className="vvEmp-modalOverlay" onClick={() => setEditing(null)}>
+            <div className="vvEmp-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="vvEmp-modalTitle">Edit Employee</div>
+
+              <div className="vvEmp-modalGrid">
+                <input
+                  placeholder="Staff ID"
                   value={editForm.employeeId}
-                  placeholder="Employee ID"
                   onChange={(e) =>
                     setEditForm({ ...editForm, employeeId: e.target.value })
                   }
                 />
                 <input
-                  value={editForm.email}
-                  placeholder="Email"
-                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
-                />
-
-                <select
-                  value={editForm.gender}
-                  onChange={(e) => setEditForm({ ...editForm, gender: e.target.value })}
-                >
-                  <option value="">Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-
-                <input
-                  value={editForm.mobile}
-                  placeholder="Mobile"
-                  onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
-                />
-                <input
-                  value={editForm.address}
-                  placeholder="Address"
+                  placeholder="Name"
+                  value={editForm.name}
                   onChange={(e) =>
-                    setEditForm({ ...editForm, address: e.target.value })
+                    setEditForm({ ...editForm, name: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Department"
+                  value={editForm.department}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, department: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Designation"
+                  value={editForm.designation}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, designation: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Gender"
+                  value={editForm.gender}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, gender: e.target.value })
                   }
                 />
                 <input
                   type="date"
                   value={editForm.dob}
-                  onChange={(e) => setEditForm({ ...editForm, dob: e.target.value })}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, dob: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Address"
+                  value={editForm.address}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, address: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Contact"
+                  value={editForm.mobile}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, mobile: e.target.value })
+                  }
+                />
+                <input
+                  placeholder="Mail"
+                  value={editForm.email}
+                  onChange={(e) =>
+                    setEditForm({ ...editForm, email: e.target.value })
+                  }
                 />
               </div>
 
-              <div className="empadm-modalActions">
-                <button className="empadm-saveBtn" onClick={saveEdit}>
+              <div className="vvEmp-modalActions">
+                <button
+                  className="vvEmp-btn primary"
+                  onClick={saveEdit}
+                  type="button"
+                >
                   Save
                 </button>
-                <button className="empadm-cancelBtn" onClick={() => setEditing(null)}>
+                <button
+                  className="vvEmp-btn"
+                  onClick={() => setEditing(null)}
+                  type="button"
+                >
                   Cancel
                 </button>
               </div>

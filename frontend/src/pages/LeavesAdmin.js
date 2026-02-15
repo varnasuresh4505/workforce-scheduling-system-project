@@ -47,11 +47,17 @@ function LeavesAdmin() {
   return `${formattedHour}:${minute} ${ampm}`;
 };
 
+const pad2 = (n) => String(n).padStart(2, "0");
+const formatDDMMYYYY = (dateValue) => {
+  const d = new Date(dateValue);
+  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+};
+
   return (
     <Layout>
     <div className="admin-leaves">
       <h2>Leave Requests</h2>
-
+      
       <table>
         <thead>
           <tr>
@@ -71,8 +77,8 @@ function LeavesAdmin() {
             <tr key={l._id}>
               <td>{l.employee?.employeeId}</td>
               <td>{l.employee?.name} <br /><small>{l.employee?.email}</small></td>
-              <td>{new Date(l.fromDate).toLocaleDateString()}</td>
-              <td>{new Date(l.toDate).toLocaleDateString()}</td>
+              <td>{formatDDMMYYYY(l.fromDate)}</td>
+              <td>{formatDDMMYYYY(l.toDate)}</td>
               <td>{formatTime(l.startTime)} - {formatTime(l.endTime)}</td>
               <td>{l.reason}</td>
               <td className={`status ${l.status}`}>{l.status}</td>
@@ -96,7 +102,8 @@ function LeavesAdmin() {
           )}
         </tbody>
       </table>
-    </div>
+      </div>
+
     </Layout>
   );
 }

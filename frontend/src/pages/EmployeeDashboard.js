@@ -26,6 +26,12 @@ function EmployeeDashboard() {
   // or change this path to your file name
   const profileImg = "/profile.png";
 
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const formatDDMMYYYY = (dateValue) => {
+  const d = new Date(dateValue);
+  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+};
+
   return (
     <div className="emp-page">
       <h2 className="emp-title">My Profile</h2>
@@ -54,8 +60,20 @@ function EmployeeDashboard() {
 
           <div className="profile-grid">
             <div className="field">
+              <div className="label">Employee Name</div>
+              <div className="value">{u.name || "-"}</div>
+            </div>
+            <div className="field">
               <div className="label">Employee ID</div>
               <div className="value">{u.employeeId || "-"}</div>
+            </div>
+            <div className="field">
+              <div className="label">Department</div>
+              <div className="value">{u.department || "-"}</div>
+            </div>
+            <div className="field">
+              <div className="label">Designation</div>
+              <div className="value">{u.designation || "-"}</div>
             </div>
 
             <div className="field">
@@ -76,7 +94,7 @@ function EmployeeDashboard() {
             <div className="field">
               <div className="label">Date of Birth</div>
               <div className="value">
-                {u.dob ? new Date(u.dob).toLocaleDateString() : "-"}
+                {formatDDMMYYYY(u.dob)}
               </div>
             </div>
 
