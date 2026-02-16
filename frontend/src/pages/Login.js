@@ -24,7 +24,7 @@ function Login() {
       });
 
       localStorage.setItem("userInfo", JSON.stringify(res.data));
-      navigate("/dashboard");
+      navigate("/schedules");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
@@ -37,7 +37,7 @@ function Login() {
       <div className="vv-login-card">
         <div className="vv-login-header">
           <HeartPulse size={36} className="vv-login-icon" />
-          <h2 className="vv-login-title">VV Hospital</h2>
+          <h2 className="vv-login-title">SVT Hospital</h2>
           <p className="vv-login-subtitle">Workforce Scheduling System</p>
         </div>
 

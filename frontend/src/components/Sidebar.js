@@ -22,7 +22,7 @@ function Sidebar() {
     <div className="sidebar">
       <h2 className="sidebar-title">
         <Hospital size={28} className="logo-icon" />
-        VV Hospital
+        SVT Hospital
       </h2>
 
       <ul className="sidebar-menu">

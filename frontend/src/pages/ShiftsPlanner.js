@@ -144,9 +144,11 @@ function ShiftsPlanner() {
 
 const ymd = (date) => {
   const d = new Date(date);
-  return d.toISOString().split("T")[0];
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`; // local date (no UTC conversion)
 };
-
   return (
     <Layout>
       <div className="planner-page">
