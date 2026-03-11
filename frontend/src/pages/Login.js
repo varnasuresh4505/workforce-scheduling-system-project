@@ -24,7 +24,7 @@ function Login() {
       });
 
       localStorage.setItem("userInfo", JSON.stringify(res.data));
-      navigate("/schedules");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {

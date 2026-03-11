@@ -27,7 +27,7 @@ function Sidebar() {
 
       <ul className="sidebar-menu">
         <li>
-          <NavLink to="/schedules" className={linkClass}>
+          <NavLink to="/dashboard" className={linkClass}>
             <FaCalendarAlt className="side-icon" />
             <span>Dashboard</span>
           </NavLink>

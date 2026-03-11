@@ -1,3 +1,5 @@
+// Employees.jsx (FULL corrected code)
+
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -28,9 +30,10 @@ function Employees() {
     mobile: "",
     email: "",
     password: "",
+    gender: "", // ✅ ensure exists
   });
 
-  // edit modal (optional)
+  // edit modal
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({
     employeeId: "",
@@ -42,6 +45,7 @@ function Employees() {
     address: "",
     mobile: "",
     email: "",
+    gender: "", // ✅ FIX: add gender
   });
 
   useEffect(() => {
@@ -55,9 +59,7 @@ function Employees() {
     try {
       const res = await axios.get(
         "http://localhost:5000/api/employees/with-hours",
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        },
+        { headers: { Authorization: `Bearer ${user.token}` } }
       );
       setEmployees(res.data);
     } catch (err) {
@@ -71,6 +73,8 @@ function Employees() {
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase().trim();
+    if (!q) return employees;
+
     return employees.filter((e) => {
       return (
         e.name?.toLowerCase().includes(q) ||
@@ -94,6 +98,7 @@ function Employees() {
       mobile: "",
       email: "",
       password: "",
+      gender: "",
     });
     setAddOpen(true);
   };
@@ -131,6 +136,7 @@ function Employees() {
       address: emp.address || "",
       mobile: emp.mobile || "",
       email: emp.email || "",
+      gender: emp.gender || "", // ✅ FIX: set gender from backend
     });
   };
 
@@ -139,9 +145,7 @@ function Employees() {
       await axios.put(
         `http://localhost:5000/api/employees/${editing._id}`,
         editForm,
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        },
+        { headers: { Authorization: `Bearer ${user.token}` } }
       );
       setEditing(null);
       setPop({
@@ -179,9 +183,11 @@ function Employees() {
 
   const pad2 = (n) => String(n).padStart(2, "0");
   const formatDDMMYYYY = (dateValue) => {
-  const d = new Date(dateValue);
-  return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
-};
+    if (!dateValue) return "-";
+    const d = new Date(dateValue);
+    if (Number.isNaN(d.getTime())) return "-";
+    return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
+  };
 
   return (
     <Layout>
@@ -259,6 +265,7 @@ function Employees() {
                     <div className="vvEmp-label">Staff ID</div>
                     <div className="vvEmp-value">{u.employeeId || "-"}</div>
                   </div>
+
                   <div className="vvEmp-field">
                     <div className="vvEmp-label">Staff Name</div>
                     <div className="vvEmp-value">{u.name || "-"}</div>
@@ -268,6 +275,7 @@ function Employees() {
                     <div className="vvEmp-label">Department</div>
                     <div className="vvEmp-value">{u.department || "-"}</div>
                   </div>
+
                   <div className="vvEmp-field">
                     <div className="vvEmp-label">Designation</div>
                     <div className="vvEmp-value">{u.designation || "-"}</div>
@@ -277,19 +285,20 @@ function Employees() {
                     <div className="vvEmp-label">Email</div>
                     <div className="vvEmp-value">{u.email || "-"}</div>
                   </div>
+
                   <div className="vvEmp-field">
                     <div className="vvEmp-label">Contact</div>
                     <div className="vvEmp-value">{u.mobile || "-"}</div>
                   </div>
+
                   <div className="vvEmp-field">
                     <div className="vvEmp-label">Gender</div>
                     <div className="vvEmp-value">{u.gender || "-"}</div>
                   </div>
+
                   <div className="vvEmp-field">
                     <div className="vvEmp-label">Date of Birth</div>
-                    <div className="vvEmp-value">
-                      {formatDDMMYYYY(u.dob)}
-                    </div>
+                    <div className="vvEmp-value">{formatDDMMYYYY(u.dob)}</div>
                   </div>
 
                   <div className="vvEmp-field">
@@ -314,99 +323,130 @@ function Employees() {
         </div>
 
         {/* ADD MODAL */}
-        {addOpen && (
-          <div className="vvEmp-modalOverlay" onClick={() => setAddOpen(false)}>
-            <div className="vvEmp-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="vvEmp-modalTitle">Add Employee</div>
+        {/* ADD MODAL (WITH LABELS LIKE SCREENSHOT) */}
+{addOpen && (
+  <div className="vvEmp-modalOverlay" onClick={() => setAddOpen(false)}>
+    <div className="vvEmp-modal big" onClick={(e) => e.stopPropagation()}>
+      <div className="vvEmp-modalHead">
+        <h3 className="vvEmp-modalTitle">Add Employee</h3>
 
-              <div className="vvEmp-modalGrid">
-                <input
-                  placeholder="Staff ID"
-                  value={form.employeeId}
-                  onChange={(e) =>
-                    setForm({ ...form, employeeId: e.target.value })
-                  }
-                />
-                <input
-                  placeholder="Name"
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                />
-                <input
-                  placeholder="Department"
-                  value={form.department}
-                  onChange={(e) =>
-                    setForm({ ...form, department: e.target.value })
-                  }
-                />
-                <input
-                  placeholder="Designation"
-                  value={form.designation}
-                  onChange={(e) =>
-                    setForm({ ...form, designation: e.target.value })
-                  }
-                />
-                <select
-                  value={form.gender}
-                  onChange={(e) => setForm({ ...form, gender: e.target.value })}
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
-                <input
-                  type="date"
-                  value={form.dob}
-                  onChange={(e) => setForm({ ...form, dob: e.target.value })}
-                />
-                <input
-                  placeholder="Address"
-                  value={form.address}
-                  onChange={(e) =>
-                    setForm({ ...form, address: e.target.value })
-                  }
-                />
-                <input
-                  placeholder="Contact"
-                  value={form.mobile}
-                  onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-                />
-                <input
-                  placeholder="Mail"
-                  value={form.email}
-                  onChange={(e) => setForm({ ...form, email: e.target.value })}
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  value={form.password}
-                  onChange={(e) =>
-                    setForm({ ...form, password: e.target.value })
-                  }
-                />
-              </div>
+        <button
+          className="vvEmp-closeBtn"
+          onClick={() => setAddOpen(false)}
+          type="button"
+        >
+          ✕
+        </button>
+      </div>
 
-              <div className="vvEmp-modalActions">
-                <button
-                  className="vvEmp-btn primary"
-                  onClick={addEmployee}
-                  type="button"
-                >
-                  Create
-                </button>
-                <button
-                  className="vvEmp-btn"
-                  onClick={() => setAddOpen(false)}
-                  type="button"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+      <div className="vvEmp-formGrid">
+        <div className="vvEmp-field2">
+          <label>Staff ID</label>
+          <input
+            value={form.employeeId}
+            onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
+            placeholder="Enter Staff ID"
+          />
+        </div>
 
+        <div className="vvEmp-field2">
+          <label>Name</label>
+          <input
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Enter Name"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Department</label>
+          <input
+            value={form.department}
+            onChange={(e) => setForm({ ...form, department: e.target.value })}
+            placeholder="Enter Department"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Designation</label>
+          <input
+            value={form.designation}
+            onChange={(e) => setForm({ ...form, designation: e.target.value })}
+            placeholder="Enter Designation"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Gender</label>
+          <select
+            value={form.gender || ""}
+            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Date of Birth</label>
+          <input
+            type="date"
+            value={form.dob}
+            onChange={(e) => setForm({ ...form, dob: e.target.value })}
+          />
+        </div>
+
+        <div className="vvEmp-field2 full">
+          <label>Address</label>
+          <input
+            value={form.address}
+            onChange={(e) => setForm({ ...form, address: e.target.value })}
+            placeholder="Enter Address"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Contact</label>
+          <input
+            value={form.mobile}
+            onChange={(e) => setForm({ ...form, mobile: e.target.value })}
+            placeholder="Enter Contact Number"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Email</label>
+          <input
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
+            placeholder="Enter Email"
+          />
+        </div>
+
+        <div className="vvEmp-field2">
+          <label>Password</label>
+          <input
+            type="password"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
+            placeholder="Enter Password"
+          />
+        </div>
+      </div>
+
+      <div className="vvEmp-modalActions">
+        <button className="vvEmp-btn primary" onClick={addEmployee} type="button">
+          Create
+        </button>
+        <button className="vvEmp-btn" onClick={() => setAddOpen(false)} type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+)}
         {/* EDIT MODAL */}
         {editing && (
           <div className="vvEmp-modalOverlay" onClick={() => setEditing(null)}>
@@ -442,13 +482,20 @@ function Employees() {
                     setEditForm({ ...editForm, designation: e.target.value })
                   }
                 />
-                <input
-                  placeholder="Gender"
+
+                {/* ✅ FIX: gender dropdown */}
+                <select
                   value={editForm.gender}
                   onChange={(e) =>
                     setEditForm({ ...editForm, gender: e.target.value })
                   }
-                />
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+
                 <input
                   type="date"
                   value={editForm.dob}

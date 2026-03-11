@@ -268,7 +268,7 @@ function Schedules() {
   }, [schedules, search]);
 
   return (
-    <Layout>
+    
       <div className="vvSched-page">
         {/* ✅ TOP FIXED HEADER AREA */}
         <div className="vvSched-fixedTop">
@@ -486,7 +486,7 @@ function Schedules() {
           </div>
         )}
       </div>
-    </Layout>
+    
   );
 }
 

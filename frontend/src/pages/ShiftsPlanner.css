@@ -1,37 +1,40 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
 
-/* Page wrapper */
 .planner-page {
+  font-family: "Poppins", sans-serif;
   padding: 20px;
   height: 100%;
-  font-family: "Poppins", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
-/* Top bar */
-.planner-top {
+/* Fixed top */
+.planner-fixedTop {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+
+.planner-topRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
 }
 
-.planner-top h2 {
+.planner-title {
   margin: 0;
   font-size: 20px;
   font-weight: 800;
   color: #0f172a;
 }
 
-/* Week controls */
+/* Week buttons */
 .week-controls {
   display: flex;
   gap: 10px;
   align-items: center;
-  position: relative;  /* instead of sticky */
-  top: auto;
 }
-
 
 .week-controls button {
   padding: 9px 14px;
@@ -40,7 +43,7 @@
   background: #0f172a;
   color: white;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   transition: 0.2s;
 }
 
@@ -49,45 +52,109 @@
   transform: translateY(-1px);
 }
 
-/* ✅ IMPORTANT: wrapper for horizontal scroll (Sunday column visible) */
-.planner-gridWrap {
-  width: 100%;
-  overflow-x: auto;
-  padding-bottom: 10px;
+/* Search */
+.planner-searchRow {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
 
-/* ✅ Make sure 9 columns fit always */
+.planner-searchIcon {
+  font-size: 18px;
+  color: #64748b;
+}
+
+.planner-searchInput {
+  border: none;
+  outline: none;
+  flex: 1;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  color: #0f172a;
+}
+
+/* Board */
+.planner-board {
+  flex: 1;
+  min-height: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* Scroll (hidden scrollbar) */
+.planner-scroll {
+  height: 100%;
+  overflow: auto;
+  padding: 12px;
+  padding-bottom: 22px;
+  background: #f8fafc;
+
+  position: relative;
+  isolation: isolate;
+
+  scrollbar-width: none;
+}
+
+.planner-scroll::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Grid */
 .planner-grid {
   display: grid;
-  grid-template-columns: 140px 220px repeat(7, minmax(140px, 1fr));
-  gap: 8px;
+  grid-template-columns: 140px 240px repeat(7, minmax(170px, 1fr));
+  gap: 10px;
+  min-width: 1500px;
   align-items: stretch;
-  min-width: 1200px; /* ✅ forces all columns visible by scroll */
+}
+
+/* ✅ Sticky header row only */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 50;
 }
 
 /* Header */
 .header-cell {
   background: #0f172a;
   color: white;
-  padding: 10px;
-  font-weight: 700;
-  border-radius: 10px;
+  padding: 12px 10px;
+  font-weight: 800;
+  border-radius: 12px;
   text-align: center;
   font-size: 13px;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.18);
+
+  /* important so header covers content under it */
+  background-clip: padding-box;
 }
 
-/* Cells */
+/* Body cells */
 .empid-cell,
 .emp-cell,
 .day-cell {
   background: white;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 10px;
+  border-radius: 14px;
+  padding: 12px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+  position: relative;
+  z-index: 1;
 }
 
 .empid-cell {
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
   color: #0f172a;
 }
@@ -99,25 +166,48 @@
 
 /* Day cell */
 .day-cell {
-  min-height: 70px;
+  min-height: 78px;
   cursor: pointer;
   transition: 0.15s;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .day-cell:hover {
-  background: #f8fafc;
+  background: #f9fafb;
   border-color: #cbd5e1;
+  transform: translateY(-1px);
 }
 
 /* Shift box */
 .shift-box {
   background: #1e293b;
   color: white;
-  padding: 6px 8px;
-  border-radius: 10px;
-  margin-bottom: 6px;
+  padding: 8px 10px;
+  border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.18);
+}
+
+.empty-slot {
+  color: #94a3b8;
+  font-weight: 700;
+  text-align: center;
+  padding-top: 8px;
+  user-select: none;
+}
+
+/* Empty state */
+.planner-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 18px;
+  color: #64748b;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
 }
 
 /* Modal */
@@ -143,7 +233,7 @@
 .modal h3 {
   margin: 0 0 10px;
   color: #0f172a;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .modal p {
@@ -173,14 +263,11 @@
   box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12);
 }
 
-/* Modal buttons */
 .modal-actions {
   display: flex;
   gap: 10px;
   margin-top: 14px;
 }
-
-
 
 .modal-actions button {
   flex: 1;
@@ -190,24 +277,8 @@
   cursor: pointer;
   background: #0f172a;
   color: white;
-  font-weight: 700;
+  font-weight: 500;
   transition: 0.2s;
-}
-
-.planner-gridWrap {
-  width: 100%;
-  height: 100%;
-  overflow-x: auto;
-  padding-bottom: 8px;
-}
-
-.planner-grid {
-  min-width: 1200px;
-}
-
-.planner-page {
-  padding: 20px;
-  height: 100%;
 }
 
 .modal-actions button:hover {
@@ -220,4 +291,10 @@
 
 .modal-actions button:last-child:hover {
   background: #64748b;
+}
+
+.day-cell-disabled {
+  
+  cursor: not-allowed;
+  
 }

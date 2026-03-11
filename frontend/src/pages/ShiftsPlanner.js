@@ -3,11 +3,12 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./ShiftsPlanner.css";
 import Layout from "../components/Layout";
+import { FiSearch } from "react-icons/fi";
 
 const startOfWeek = (date) => {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = (day === 0 ? -6 : 1) - day; // Monday start
+  const diff = (day === 0 ? -6 : 1) - day;
   d.setDate(d.getDate() + diff);
   d.setHours(0, 0, 0, 0);
   return d;
@@ -19,7 +20,13 @@ const addDays = (date, n) => {
   return d;
 };
 
-
+const ymd = (date) => {
+  const d = new Date(date);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+};
 
 function ShiftsPlanner() {
   const navigate = useNavigate();
@@ -28,6 +35,7 @@ function ShiftsPlanner() {
   const [weekStart, setWeekStart] = useState(startOfWeek(new Date()));
   const [employees, setEmployees] = useState([]);
   const [shifts, setShifts] = useState([]);
+  const [search, setSearch] = useState("");
 
   const [open, setOpen] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState(null);
@@ -38,13 +46,21 @@ function ShiftsPlanner() {
     endTime: "17:00",
   });
 
-  const days = useMemo(() => {
-    return Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
-  }, [weekStart]);
+  const days = useMemo(
+    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
+    [weekStart]
+  );
 
   useEffect(() => {
-    if (!user) return navigate("/");
-    if (user.role !== "admin") return navigate("/dashboard");
+    if (!user) {
+      navigate("/");
+      return;
+    }
+
+    if (user.role !== "admin") {
+      navigate("/dashboard");
+      return;
+    }
 
     fetchEmployees();
     fetchShifts();
@@ -52,7 +68,9 @@ function ShiftsPlanner() {
   }, []);
 
   useEffect(() => {
-    fetchShifts();
+    if (user?.role === "admin") {
+      fetchShifts();
+    }
     // eslint-disable-next-line
   }, [weekStart]);
 
@@ -61,7 +79,7 @@ function ShiftsPlanner() {
       const res = await axios.get("http://localhost:5000/api/employees", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setEmployees(res.data);
+      setEmployees(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
       alert("Failed to fetch employees");
@@ -70,12 +88,14 @@ function ShiftsPlanner() {
 
   const fetchShifts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/shifts", {
+      // corrected endpoint
+      const res = await axios.get("http://localhost:5000/api/schedules", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setShifts(res.data);
+      setShifts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
+      setShifts([]);
     }
   };
 
@@ -87,25 +107,27 @@ function ShiftsPlanner() {
   };
 
   const createShift = async () => {
-    if (!selectedEmp?._id || !selectedDate) return;
+    if (!selectedEmp?.employeeId || !selectedDate) return;
 
     try {
       await axios.post(
-        "http://localhost:5000/api/shifts",
+        "http://localhost:5000/api/schedules",
         {
-          employeeId: selectedEmp._id, // backend expects employee objectId
+          employeeId: selectedEmp.employeeId,
           date: selectedDate,
-          startTime: form.startTime,
-          endTime: form.endTime,
+          fromTime: form.startTime,
+          toTime: form.endTime,
         },
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
       );
 
-      alert("Shift created ✅");
       setOpen(false);
-      fetchShifts();
+      await fetchShifts();
     } catch (err) {
-      alert(err.response?.data?.message || "Error creating shift");
+      console.error(err);
+      alert(err.response?.data?.message || "Error creating schedule");
     }
   };
 
@@ -115,107 +137,153 @@ function ShiftsPlanner() {
   };
 
   const formatTime = (time) => {
-  if (!time) return "-";
+    if (!time) return "-";
+    const t = String(time).trim();
 
-  const t = String(time).trim();
+    if (/am|pm/i.test(t)) {
+      return t
+        .replace(/\s+/g, " ")
+        .replace(/am/i, "AM")
+        .replace(/pm/i, "PM");
+    }
 
-  // If backend already sent AM/PM, just normalize the casing and spacing
-  if (/am|pm/i.test(t)) {
-    return t
-      .replace(/\s+/g, " ")
-      .replace(/am/i, "AM")
-      .replace(/pm/i, "PM");
-  }
+    const parts = t.split(":");
+    if (parts.length < 2) return t;
 
-  // Accept "HH:mm" or "HH:mm:ss"
-  const parts = t.split(":");
-  if (parts.length < 2) return t;
+    const h = parseInt(parts[0], 10);
+    const m = parts[1];
+    if (Number.isNaN(h)) return t;
 
-  const h = parseInt(parts[0], 10);
-  const m = parts[1];
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
 
-  if (Number.isNaN(h)) return t;
+    return `${hour12}:${m} ${ampm}`;
+  };
 
-  const ampm = h >= 12 ? "PM" : "AM";
-  const hour12 = h % 12 || 12;
+  const filteredEmployees = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return employees;
 
-  return `${hour12}:${m} ${ampm}`;
-};
+    return employees.filter((emp) => {
+      const hay = [
+        emp.employeeId,
+        emp.name,
+        emp.department,
+        emp.designation,
+        emp.email,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-const ymd = (date) => {
-  const d = new Date(date);
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`; // local date (no UTC conversion)
-};
+      return hay.includes(q);
+    });
+  }, [employees, search]);
+
   return (
     <Layout>
       <div className="planner-page">
-        <div className="planner-top">
-          <h2>Shift Planner</h2>
+        <div className="planner-fixedTop">
+          <div className="planner-topRow">
+            <h2 className="planner-title">Shift Planner</h2>
 
-          <div className="week-controls">
-            <button onClick={() => setWeekStart(addDays(weekStart, -7))}>Prev</button>
-            <button onClick={() => setWeekStart(startOfWeek(new Date()))}>This Week</button>
-            <button onClick={() => setWeekStart(addDays(weekStart, 7))}>Next</button>
+            <div className="week-controls">
+              <button onClick={() => setWeekStart(addDays(weekStart, -7))}>
+                Prev
+              </button>
+              <button onClick={() => setWeekStart(startOfWeek(new Date()))}>
+                This Week
+              </button>
+              <button onClick={() => setWeekStart(addDays(weekStart, 7))}>
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div className="planner-searchRow">
+            <FiSearch className="planner-searchIcon" />
+            <input
+              className="planner-searchInput"
+              placeholder="Search staff id / name"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
         </div>
 
-        <div className="planner-gridWrap">
-  <div className="planner-grid">
-          {/* ✅ Header row (9 columns exactly) */}
-          <div className="header-cell">Emp ID</div>
-          <div className="header-cell">Employee</div>
+        <div className="planner-board">
+          <div className="planner-scroll">
+            <div className="planner-grid">
+              <div className="header-cell sticky-top">Emp ID</div>
+              <div className="header-cell sticky-top">Employee</div>
 
-          {days.map((d) => (
-            <div key={ymd(d)} className="header-cell">
-              {formatDayHeader(d)}
-            </div>
-          ))}
+              {days.map((d) => (
+                <div key={ymd(d)} className="header-cell sticky-top">
+                  {formatDayHeader(d)}
+                </div>
+              ))}
 
-          {/* ✅ Body rows (9 columns per employee) */}
-          {employees.map((emp) => (
-            <React.Fragment key={emp._id}>
-              <div className="empid-cell">{emp.employeeId || "-"}</div>
-              <div className="emp-cell">{emp.name}</div>
+              {filteredEmployees.map((emp) => (
+                <React.Fragment key={emp._id}>
+                  <div className="empid-cell">{emp.employeeId || "-"}</div>
+                  <div className="emp-cell">{emp.name}</div>
 
-              {days.map((d) => {
-                const dayKey = ymd(d);
+                  {days.map((d) => {
+                    const dayKey = ymd(d);
 
-                const cellShifts = shifts.filter((s) => {
-                  const shiftEmpId = s.employee?._id || s.employee; // supports both populated/unpopulated
-                  const sameEmp = String(shiftEmpId) === String(emp._id);
-                  const sameDay = ymd(s.date) === dayKey;
-                  return sameEmp && sameDay;
-                });
+                    const cellShifts = shifts.filter((s) => {
+                      const shiftEmpId =
+                        s.employee?._id ||
+                        s.employee ||
+                        s.employeeId?._id ||
+                        s.employeeId;
 
-                return (
-                  <div
-                    key={`${emp._id}_${dayKey}`}
-                    className="day-cell"
-                    title="Double click to add shift"
-                    onDoubleClick={() => openModal(emp, d)}
-                  >
-                    {cellShifts.map((s) => (
-                      <div key={s._id} className="shift-box">
-                        {formatTime(s.startTime)} - {formatTime(s.endTime)}
+                      const sameEmp =
+                        String(shiftEmpId) === String(emp._id) ||
+                        String(shiftEmpId) === String(emp.employeeId);
+
+                      const sameDay = ymd(s.date) === dayKey;
+
+                      return sameEmp && sameDay;
+                    });
+
+                    return (
+                      <div
+                        key={`${emp._id}_${dayKey}`}
+                        className="day-cell"
+                        title="Double click to add shift"
+                        onDoubleClick={() => openModal(emp, d)}
+                      >
+                        {cellShifts.length === 0 ? (
+                          <div className="empty-slot">—</div>
+                        ) : (
+                          cellShifts.map((s) => (
+                            <div key={s._id} className="shift-box">
+                              {formatTime(s.startTime || s.fromTime)} -{" "}
+                              {formatTime(s.endTime || s.toTime)}
+                            </div>
+                          ))
+                        )}
                       </div>
-                    ))}
-                  </div>
-                );
-              })}
-            </React.Fragment>
-          ))}
+                    );
+                  })}
+                </React.Fragment>
+              ))}
+
+              {filteredEmployees.length === 0 && (
+                <div className="planner-empty">No employees found</div>
+              )}
+            </div>
+          </div>
         </div>
 
-        {/* Modal */}
         {open && (
           <div className="modal-overlay">
             <div className="modal">
               <h3>Create Shift</h3>
               <p>
-                <b>Employee:</b> {selectedEmp?.name} ({selectedEmp?.employeeId || "-"})
+                <b>Employee:</b> {selectedEmp?.name} (
+                {selectedEmp?.employeeId || "-"})
               </p>
               <p>
                 <b>Date:</b> {selectedDate}
@@ -225,12 +293,16 @@ const ymd = (date) => {
                 <input
                   type="time"
                   value={form.startTime}
-                  onChange={(e) => setForm({ ...form, startTime: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, startTime: e.target.value })
+                  }
                 />
                 <input
                   type="time"
                   value={form.endTime}
-                  onChange={(e) => setForm({ ...form, endTime: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, endTime: e.target.value })
+                  }
                 />
               </div>
 
@@ -241,7 +313,6 @@ const ymd = (date) => {
             </div>
           </div>
         )}
-      </div>
       </div>
     </Layout>
   );
