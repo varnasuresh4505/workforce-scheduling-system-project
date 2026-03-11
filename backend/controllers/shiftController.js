@@ -1,12 +1,21 @@
 const Shift = require("../models/Shift");
+const Leave = require("../models/Leave");
 
-// ✅ Helper: "HH:mm" -> minutes
+// "HH:mm" -> minutes
 const toMinutes = (t) => {
-  const [h, m] = t.split(":").map(Number);
+  const [h, m] = String(t).split(":").map(Number);
   return h * 60 + m;
 };
 
-// ✅ Create Shift with overlap check
+// overlap helper
+const overlaps = (aStart, aEnd, bStart, bEnd) => aStart < bEnd && aEnd > bStart;
+
+// local midnight date from "YYYY-MM-DD"
+const toLocalMidnight = (ymd) => {
+  const [y, m, d] = ymd.split("-").map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0);
+};
+
 exports.createShift = async (req, res) => {
   try {
     const { employeeId, date, startTime, endTime } = req.body;
@@ -16,17 +25,42 @@ exports.createShift = async (req, res) => {
     }
 
     const start = toMinutes(startTime);
-    const end = toMinutes(endTime);
+    let end = toMinutes(endTime);
 
-    if (end <= start) {
-      return res.status(400).json({ message: "End time must be after start time" });
+    if (!Number.isFinite(start) || !Number.isFinite(end)) {
+      return res.status(400).json({ message: "Invalid time format" });
     }
 
-    const shiftDate = (ymd) => {
-  const [y, m, d] = ymd.split("-").map(Number);
-  return new Date(y, m - 1, d, 0, 0, 0, 0); // local midnight
-};
-  
+    // ✅ support night shift (end next day)
+    if (end <= start) end += 24 * 60;
+
+    const shiftDate = toLocalMidnight(date);
+
+    // ✅ BLOCK if approved leave overlaps this shift time
+    const approvedLeaves = await Leave.find({
+      employee: employeeId, // employeeId here is ObjectId (planner sends _id)
+      status: "approved",
+      fromDate: { $lte: shiftDate },
+      toDate: { $gte: shiftDate },
+    });
+
+    const leaveConflict = approvedLeaves.some((lv) => {
+      const ls = toMinutes(lv.startTime);
+      let le = toMinutes(lv.endTime);
+
+      // if leave time crosses midnight, support it
+      if (le <= ls) le += 24 * 60;
+
+      return overlaps(start, end, ls, le);
+    });
+
+    if (leaveConflict) {
+      return res.status(400).json({
+        message: "Cannot create shift: employee has an approved leave during this time",
+      });
+    }
+
+    // ✅ Overlap check with existing shifts
     const existingShifts = await Shift.find({
       employee: employeeId,
       date: shiftDate,
@@ -34,8 +68,9 @@ exports.createShift = async (req, res) => {
 
     const isOverlapping = existingShifts.some((s) => {
       const oldStart = toMinutes(s.startTime);
-      const oldEnd = toMinutes(s.endTime);
-      return start < oldEnd && end > oldStart;
+      let oldEnd = toMinutes(s.endTime);
+      if (oldEnd <= oldStart) oldEnd += 24 * 60;
+      return overlaps(start, end, oldStart, oldEnd);
     });
 
     if (isOverlapping) {
@@ -57,11 +92,10 @@ exports.createShift = async (req, res) => {
   }
 };
 
-// ✅ Get all shifts
 exports.getShifts = async (req, res) => {
   try {
     const shifts = await Shift.find()
-      .populate("employee", "name email")
+      .populate("employee", "name email employeeId")
       .sort({ date: 1 });
 
     return res.json(shifts);

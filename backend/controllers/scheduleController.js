@@ -28,46 +28,16 @@ const toMinutes = (t) => {
 const pad2 = (n) => String(n).padStart(2, "0");
 const minutesToHHMM = (mins) => `${pad2(Math.floor(mins / 60))}:${pad2(mins % 60)}`;
 
+// overlap check
 const overlaps = (startA, endA, startB, endB) => startA < endB && endA > startB;
 
-// merge overlapping/adjacent intervals
-const mergeIntervals = (arr) => {
-  if (!arr.length) return [];
-  const sorted = [...arr].sort((a, b) => a.start - b.start);
-  const merged = [sorted[0]];
-  for (let i = 1; i < sorted.length; i++) {
-    const last = merged[merged.length - 1];
-    const cur = sorted[i];
-    if (cur.start <= last.end) {
-      last.end = Math.max(last.end, cur.end);
-    } else {
-      merged.push(cur);
-    }
-  }
-  return merged;
+// local midnight date helper (prevents timezone shift issues)
+const ymdToLocalMidnight = (ymd) => {
+  const [y, m, d] = String(ymd).split("-").map(Number);
+  return new Date(y, m - 1, d, 0, 0, 0, 0);
 };
 
-// subtract blocked intervals from a single [start,end] interval
-const subtractIntervals = (baseStart, baseEnd, blocked) => {
-  let free = [{ start: baseStart, end: baseEnd }];
-
-  for (const b of blocked) {
-    const next = [];
-    for (const slot of free) {
-      if (!overlaps(slot.start, slot.end, b.start, b.end)) {
-        next.push(slot);
-        continue;
-      }
-      // cut out the overlap region
-      if (slot.start < b.start) next.push({ start: slot.start, end: Math.min(b.start, slot.end) });
-      if (slot.end > b.end) next.push({ start: Math.max(b.end, slot.start), end: slot.end });
-    }
-    free = next;
-  }
-
-  return free.filter((s) => s.end > s.start);
-};
-
+// ✅ Admin creates schedule -> also creates Shift
 exports.createSchedule = async (req, res) => {
   try {
     const { employeeId, date, fromTime, toTime } = req.body;
@@ -79,18 +49,19 @@ exports.createSchedule = async (req, res) => {
     const emp = await User.findOne({ employeeId, role: "employee" }).select("-password");
     if (!emp) return res.status(404).json({ message: "Employee not found" });
 
-    const start = toMinutes(fromTime);
-    const end = toMinutes(toTime);
+    let start = toMinutes(fromTime);
+    let end = toMinutes(toTime);
 
     if (!Number.isFinite(start) || !Number.isFinite(end)) {
       return res.status(400).json({ message: "Invalid time format. Use HH:MM or HH:MM AM/PM" });
     }
-    if (end <= start) return res.status(400).json({ message: "Invalid time range" });
 
-    const scheduleDate = new Date(date);
-    scheduleDate.setHours(0, 0, 0, 0);
+    // ✅ Night shift support: 21:00 -> 02:00 becomes 21:00 -> 26:00
+    if (end <= start) end += 24 * 60;
 
-    // ✅ Get approved leaves for this date
+    const scheduleDate = ymdToLocalMidnight(date);
+
+    // ✅ 1) BLOCK if approved leave overlaps ANY part of requested time
     const approvedLeaves = await Leave.find({
       employee: emp._id,
       status: "approved",
@@ -98,108 +69,99 @@ exports.createSchedule = async (req, res) => {
       toDate: { $gte: scheduleDate },
     });
 
-    // ✅ Make leave time intervals and merge them
-    let leaveIntervals = approvedLeaves
-      .map((lv) => ({
-        start: toMinutes(lv.startTime),
-        end: toMinutes(lv.endTime),
-      }))
-      .filter((x) => Number.isFinite(x.start) && Number.isFinite(x.end) && x.end > x.start);
+    const hasLeaveOverlap = approvedLeaves.some((lv) => {
+      let ls = toMinutes(lv.startTime);
+      let le = toMinutes(lv.endTime);
 
-    leaveIntervals = mergeIntervals(leaveIntervals);
+      if (!Number.isFinite(ls) || !Number.isFinite(le)) return false;
 
-    // ✅ Compute allowed/free time slots by subtracting leave intervals
-    const freeSlots = subtractIntervals(start, end, leaveIntervals);
+      // ✅ Leave can also cross midnight
+      if (le <= ls) le += 24 * 60;
 
-    // If fully blocked by leave, reject
-    if (freeSlots.length === 0) {
+      return overlaps(start, end, ls, le);
+    });
+
+    if (hasLeaveOverlap) {
       return res.status(400).json({
-        message: "Cannot create schedule: employee is on approved leave during this entire time",
+        message: "Cannot create schedule: employee has approved leave during this time",
       });
     }
 
-    // ✅ Preload existing schedules/shifts once
+    // ✅ 2) Schedule overlap check for same date
     const existingSchedules = await Schedule.find({
       employee: emp._id,
       date: scheduleDate,
     });
 
+    const scheduleOverlap = existingSchedules.some((s) => {
+      let oldStart = toMinutes(s.fromTime);
+      let oldEnd = toMinutes(s.toTime);
+      if (oldEnd <= oldStart) oldEnd += 24 * 60; // support stored night shifts
+
+      return overlaps(start, end, oldStart, oldEnd);
+    });
+
+    if (scheduleOverlap) {
+      return res.status(400).json({ message: "Schedule overlaps with existing schedule" });
+    }
+
+    // ✅ 3) Shift overlap check (planner safe)
     const existingShifts = await Shift.find({
       employee: emp._id,
       date: scheduleDate,
     });
 
-    // ✅ Check overlap for each free slot
-    for (const slot of freeSlots) {
-      const scheduleOverlap = existingSchedules.some((s) => {
-        const oldStart = toMinutes(s.fromTime);
-        const oldEnd = toMinutes(s.toTime);
-        return overlaps(slot.start, slot.end, oldStart, oldEnd);
-      });
-      if (scheduleOverlap) {
-        return res.status(400).json({
-          message: `Schedule overlaps existing schedule for slot ${minutesToHHMM(slot.start)}-${minutesToHHMM(slot.end)}`,
-        });
-      }
+    const shiftOverlap = existingShifts.some((sh) => {
+      let oldStart = toMinutes(sh.startTime);
+      let oldEnd = toMinutes(sh.endTime);
+      if (oldEnd <= oldStart) oldEnd += 24 * 60;
 
-      const shiftOverlap = existingShifts.some((sh) => {
-        const oldStart = toMinutes(sh.startTime);
-        const oldEnd = toMinutes(sh.endTime);
-        return overlaps(slot.start, slot.end, oldStart, oldEnd);
-      });
-      if (shiftOverlap) {
-        return res.status(400).json({
-          message: `Schedule overlaps existing shift for slot ${minutesToHHMM(slot.start)}-${minutesToHHMM(slot.end)}`,
-        });
-      }
+      return overlaps(start, end, oldStart, oldEnd);
+    });
+
+    if (shiftOverlap) {
+      return res.status(400).json({ message: "Shift overlaps with existing shift" });
     }
 
-    // ✅ Create schedules + shifts for each free slot
-    const createdSchedules = [];
+    // ✅ Normalize times back to HH:mm for storing
+    const storeFrom = minutesToHHMM(start % (24 * 60));
+    const storeTo = minutesToHHMM(end % (24 * 60)); // for night shift it'll look like "02:00"
 
-    for (const slot of freeSlots) {
-      const slotFrom = minutesToHHMM(slot.start);
-      const slotTo = minutesToHHMM(slot.end);
+    // ✅ Create schedule
+    const schedule = await Schedule.create({
+      employee: emp._id,
+      employeeId: emp.employeeId,
+      employeeName: emp.name,
+      department: emp.department || "",
+      designation: emp.designation || "",
+      date: scheduleDate,
+      fromTime: storeFrom,
+      toTime: storeTo,
+      assignedBy: req.user._id,
+    });
 
-      const schedule = await Schedule.create({
-        employee: emp._id,
-        employeeId: emp.employeeId,
-        employeeName: emp.name,
-        department: emp.department || "",
-        designation: emp.designation || "",
-        date: scheduleDate,
-        fromTime: slotFrom,
-        toTime: slotTo,
-        assignedBy: req.user._id,
-      });
-
-      await Shift.create({
-        employee: emp._id,
-        date: scheduleDate,
-        startTime: slotFrom,
-        endTime: slotTo,
-      });
-
-      createdSchedules.push(schedule);
-    }
+    // ✅ Auto-create shift (planner reads this)
+    await Shift.create({
+      employee: emp._id,
+      date: scheduleDate,
+      startTime: storeFrom,
+      endTime: storeTo,
+    });
 
     return res.status(201).json({
-      message:
-        createdSchedules.length > 1
-          ? "Schedule created by splitting around approved leave"
-          : "Schedule created and shift updated",
-      schedules: createdSchedules,
+      message: "Schedule created and shift updated",
+      schedule,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
 };
 
-// ✅ keep as-is
+// ✅ Admin list
 exports.getSchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find()
-      .populate("employee", "name employeeId email gender")
+      .populate("employee", "name employeeId email gender department designation")
       .populate("assignedBy", "name")
       .sort({ date: 1 });
 
@@ -209,6 +171,7 @@ exports.getSchedules = async (req, res) => {
   }
 };
 
+// ✅ Employee list
 exports.getMySchedules = async (req, res) => {
   try {
     const schedules = await Schedule.find({ employee: req.user._id })
