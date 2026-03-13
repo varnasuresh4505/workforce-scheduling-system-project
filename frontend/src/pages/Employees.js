@@ -1,11 +1,8 @@
-// Employees.jsx (FULL corrected code)
-
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
-import "./Employees.css";
 import { FiSearch, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
 
 function Employees() {
@@ -17,7 +14,6 @@ function Employees() {
 
   const [pop, setPop] = useState({ open: false, type: "success", message: "" });
 
-  // add modal
   const [addOpen, setAddOpen] = useState(false);
   const [form, setForm] = useState({
     employeeId: "",
@@ -30,10 +26,9 @@ function Employees() {
     mobile: "",
     email: "",
     password: "",
-    gender: "", // ✅ ensure exists
+    gender: "",
   });
 
-  // edit modal
   const [editing, setEditing] = useState(null);
   const [editForm, setEditForm] = useState({
     employeeId: "",
@@ -45,7 +40,7 @@ function Employees() {
     address: "",
     mobile: "",
     email: "",
-    gender: "", // ✅ FIX: add gender
+    gender: "",
   });
 
   useEffect(() => {
@@ -136,7 +131,7 @@ function Employees() {
       address: emp.address || "",
       mobile: emp.mobile || "",
       email: emp.email || "",
-      gender: emp.gender || "", // ✅ FIX: set gender from backend
+      gender: emp.gender || "",
     });
   };
 
@@ -189,6 +184,12 @@ function Employees() {
     return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
   };
 
+  const baseInputClass =
+    "h-[52px] rounded-[14px] border border-slate-300 bg-white px-4 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-900 focus:shadow-[0_0_0_4px_rgba(15,23,42,0.1)]";
+
+  const editInputClass =
+    "h-[44px] rounded-[10px] border border-slate-300 bg-white px-3 text-[14px] text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]";
+
   return (
     <Layout>
       <Popup
@@ -198,60 +199,74 @@ function Employees() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="vvEmp-page">
-        {/* fixed header row */}
-        <div className="vvEmp-topRow">
+      <div className="h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
+        <div className="sticky top-0 z-50 flex items-center justify-between bg-slate-100 pb-[14px] pt-[25px]">
           <div>
-            <div className="vvEmp-title">Employees</div>
-            <div className="vvEmp-sub">Search and manage hospital staff</div>
+            <div className="m-0 text-[20px] font-extrabold text-slate-900">
+              Employees
+            </div>
+            <div className="mt-1 text-[13px] text-slate-500">
+              Search and manage hospital staff
+            </div>
           </div>
 
-          <button className="vvEmp-addTopBtn" onClick={openAdd} type="button">
-            <FiPlus /> Add Employee
+          <button
+            className="inline-flex h-[42px] items-center gap-2 rounded-[10px] border-none bg-slate-900 px-[14px] font-bold text-white"
+            onClick={openAdd}
+            type="button"
+          >
+            <FiPlus />
+            Add Employee
           </button>
         </div>
 
-        {/* fixed search */}
-        <div className="vvEmp-searchRow">
-          <FiSearch className="vvEmp-searchIcon" />
-          <input
-            className="vvEmp-searchInput"
-            placeholder="Search staff id / name / dept / designation / email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
+        <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-gray-200 bg-white px-[14px] py-3 shadow-[0px_6px_18px_rgba(15,23,42,0.06)] focus-within:border-slate-900 focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]">
+                <FiSearch className="text-[18px] text-slate-500" />
+                <input
+                  className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
+                  placeholder="Search staff id / name / dept / designation / email..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+              </div>
 
-        {/* scroll area only for cards */}
-        <div className="vvEmp-scrollArea">
+        <div className="h-[calc(100vh-140px)] overflow-auto pr-[2px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {filtered.map((u) => (
-            <div key={u._id} className="vvEmp-card">
-              <div className="vvEmp-cardLeft">
+            <div
+              key={u._id}
+              className="mb-[14px] grid grid-cols-1 items-start gap-[30px] rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.08)] lg:grid-cols-[140px_1fr]"
+            >
+              <div className="flex items-start justify-center pt-[10px]">
                 <img
-                  className="vvEmp-avatar"
+                  className="h-[120px] w-[120px] rounded-[12px] border border-gray-200 bg-slate-100 object-cover"
                   src={`/photos/${u.employeeId}.png`}
                   onError={(e) => (e.target.src = "/default-profile.png")}
                   alt="Profile"
                 />
               </div>
 
-              <div className="vvEmp-cardRight">
-                <div className="vvEmp-cardTop">
-                  <div className="vvEmp-nameRow">
-                    <div className="vvEmp-name">{u.name}</div>
-                    <span className="vvEmp-dot" title="Active" />
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-[10px]">
+                    <div className="text-[18px] font-bold text-slate-900">
+                      {u.name}
+                    </div>
+                    <span
+                      className="inline-block h-[10px] w-[10px] rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                      title="Active"
+                    />
                   </div>
 
-                  <div className="vvEmp-actions">
+                  <div className="flex gap-2">
                     <button
-                      className="vvEmp-iconBtn"
+                      className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:bg-indigo-50"
                       onClick={() => openEdit(u)}
                       type="button"
                     >
                       <FiEdit2 />
                     </button>
                     <button
-                      className="vvEmp-iconBtn danger"
+                      className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700"
                       onClick={() => removeEmployee(u._id)}
                       type="button"
                     >
@@ -260,57 +275,95 @@ function Employees() {
                   </div>
                 </div>
 
-                <div className="vvEmp-grid">
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Staff ID</div>
-                    <div className="vvEmp-value">{u.employeeId || "-"}</div>
+                <div className="grid grid-cols-1 gap-x-[18px] gap-y-5 md:grid-cols-2 xl:grid-cols-3">
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Staff ID
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.employeeId || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Staff Name</div>
-                    <div className="vvEmp-value">{u.name || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Staff Name
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.name || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Department</div>
-                    <div className="vvEmp-value">{u.department || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Department
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.department || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Designation</div>
-                    <div className="vvEmp-value">{u.designation || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Designation
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.designation || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Email</div>
-                    <div className="vvEmp-value">{u.email || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Email
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.email || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Contact</div>
-                    <div className="vvEmp-value">{u.mobile || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Contact
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.mobile || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Gender</div>
-                    <div className="vvEmp-value">{u.gender || "-"}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Gender
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.gender || "-"}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Date of Birth</div>
-                    <div className="vvEmp-value">{formatDDMMYYYY(u.dob)}</div>
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Date of Birth
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {formatDDMMYYYY(u.dob)}
+                    </div>
                   </div>
 
-                  <div className="vvEmp-field">
-                    <div className="vvEmp-label">Total Hours (This Week)</div>
-                    <div className="vvEmp-value">
+                  <div>
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Total Hours (This Week)
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
                       {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
                     </div>
                   </div>
 
-                  <div className="vvEmp-field full">
-                    <div className="vvEmp-label">Address</div>
-                    <div className="vvEmp-value">{u.address || "-"}</div>
+                  <div className="md:col-span-2 xl:col-span-3">
+                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                      Address
+                    </div>
+                    <div className="text-[14px] font-medium text-slate-900">
+                      {u.address || "-"}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -318,143 +371,214 @@ function Employees() {
           ))}
 
           {filtered.length === 0 && (
-            <div className="vvEmp-empty">No employees found</div>
+            <div className="rounded-[14px] border border-dashed border-slate-300 bg-white p-4 text-center text-slate-500">
+              No employees found
+            </div>
           )}
         </div>
 
-        {/* ADD MODAL */}
-        {/* ADD MODAL (WITH LABELS LIKE SCREENSHOT) */}
-{addOpen && (
-  <div className="vvEmp-modalOverlay" onClick={() => setAddOpen(false)}>
-    <div className="vvEmp-modal big" onClick={(e) => e.stopPropagation()}>
-      <div className="vvEmp-modalHead">
-        <h3 className="vvEmp-modalTitle">Add Employee</h3>
-
-        <button
-          className="vvEmp-closeBtn"
-          onClick={() => setAddOpen(false)}
-          type="button"
-        >
-          ✕
-        </button>
-      </div>
-
-      <div className="vvEmp-formGrid">
-        <div className="vvEmp-field2">
-          <label>Staff ID</label>
-          <input
-            value={form.employeeId}
-            onChange={(e) => setForm({ ...form, employeeId: e.target.value })}
-            placeholder="Enter Staff ID"
-          />
-        </div>
-
-        <div className="vvEmp-field2">
-          <label>Name</label>
-          <input
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            placeholder="Enter Name"
-          />
-        </div>
-
-        <div className="vvEmp-field2">
-          <label>Department</label>
-          <input
-            value={form.department}
-            onChange={(e) => setForm({ ...form, department: e.target.value })}
-            placeholder="Enter Department"
-          />
-        </div>
-
-        <div className="vvEmp-field2">
-          <label>Designation</label>
-          <input
-            value={form.designation}
-            onChange={(e) => setForm({ ...form, designation: e.target.value })}
-            placeholder="Enter Designation"
-          />
-        </div>
-
-        <div className="vvEmp-field2">
-          <label>Gender</label>
-          <select
-            value={form.gender || ""}
-            onChange={(e) => setForm({ ...form, gender: e.target.value })}
+        {addOpen && (
+          <div
+            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45"
+            onClick={() => setAddOpen(false)}
           >
-            <option value="">Select Gender</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-            <option value="Other">Other</option>
-          </select>
-        </div>
+            <div
+              className="w-[600px] max-w-[96vw] rounded-[18px] border border-gray-200 bg-white p-[22px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-3 flex items-start justify-between">
+                <h3 className="m-0 text-[20px] font-extrabold text-slate-900">
+                  Add Employee
+                </h3>
 
-        <div className="vvEmp-field2">
-          <label>Date of Birth</label>
-          <input
-            type="date"
-            value={form.dob}
-            onChange={(e) => setForm({ ...form, dob: e.target.value })}
-          />
-        </div>
+                <button
+                  className="h-[44px] w-[44px] rounded-[14px] border border-gray-200 bg-slate-50 text-[18px] text-slate-900 transition hover:bg-indigo-50"
+                  onClick={() => setAddOpen(false)}
+                  type="button"
+                >
+                  ✕
+                </button>
+              </div>
 
-        <div className="vvEmp-field2 full">
-          <label>Address</label>
-          <input
-            value={form.address}
-            onChange={(e) => setForm({ ...form, address: e.target.value })}
-            placeholder="Enter Address"
-          />
-        </div>
+              <div className="mt-[10px] grid grid-cols-1 gap-x-[22px] gap-y-[18px] md:grid-cols-2">
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Staff ID
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.employeeId}
+                    onChange={(e) =>
+                      setForm({ ...form, employeeId: e.target.value })
+                    }
+                    placeholder="Enter Staff ID"
+                  />
+                </div>
 
-        <div className="vvEmp-field2">
-          <label>Contact</label>
-          <input
-            value={form.mobile}
-            onChange={(e) => setForm({ ...form, mobile: e.target.value })}
-            placeholder="Enter Contact Number"
-          />
-        </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Name
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Enter Name"
+                  />
+                </div>
 
-        <div className="vvEmp-field2">
-          <label>Email</label>
-          <input
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            placeholder="Enter Email"
-          />
-        </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Department
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.department}
+                    onChange={(e) =>
+                      setForm({ ...form, department: e.target.value })
+                    }
+                    placeholder="Enter Department"
+                  />
+                </div>
 
-        <div className="vvEmp-field2">
-          <label>Password</label>
-          <input
-            type="password"
-            value={form.password}
-            onChange={(e) => setForm({ ...form, password: e.target.value })}
-            placeholder="Enter Password"
-          />
-        </div>
-      </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Designation
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.designation}
+                    onChange={(e) =>
+                      setForm({ ...form, designation: e.target.value })
+                    }
+                    placeholder="Enter Designation"
+                  />
+                </div>
 
-      <div className="vvEmp-modalActions">
-        <button className="vvEmp-btn primary" onClick={addEmployee} type="button">
-          Create
-        </button>
-        <button className="vvEmp-btn" onClick={() => setAddOpen(false)} type="button">
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-        {/* EDIT MODAL */}
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Gender
+                  </label>
+                  <select
+                    className={baseInputClass}
+                    value={form.gender || ""}
+                    onChange={(e) =>
+                      setForm({ ...form, gender: e.target.value })
+                    }
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Date of Birth
+                  </label>
+                  <input
+                    type="date"
+                    className={`${baseInputClass} text-slate-500`}
+                    value={form.dob}
+                    onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1 md:col-span-2">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Address
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.address}
+                    onChange={(e) =>
+                      setForm({ ...form, address: e.target.value })
+                    }
+                    placeholder="Enter Address"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Contact
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.mobile}
+                    onChange={(e) =>
+                      setForm({ ...form, mobile: e.target.value })
+                    }
+                    placeholder="Enter Contact Number"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Email
+                  </label>
+                  <input
+                    className={baseInputClass}
+                    value={form.email}
+                    onChange={(e) =>
+                      setForm({ ...form, email: e.target.value })
+                    }
+                    placeholder="Enter Email"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-[13px] font-semibold text-slate-700">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    className={baseInputClass}
+                    value={form.password}
+                    onChange={(e) =>
+                      setForm({ ...form, password: e.target.value })
+                    }
+                    placeholder="Enter Password"
+                  />
+                </div>
+              </div>
+
+              <div className="mt-3 flex justify-end gap-[10px]">
+                <button
+                  className="h-[44px] rounded-[10px] bg-slate-900 px-[14px] font-bold text-white"
+                  onClick={addEmployee}
+                  type="button"
+                >
+                  Create
+                </button>
+                <button
+                  className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
+                  onClick={() => setAddOpen(false)}
+                  type="button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {editing && (
-          <div className="vvEmp-modalOverlay" onClick={() => setEditing(null)}>
-            <div className="vvEmp-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="vvEmp-modalTitle">Edit Employee</div>
+          <div
+            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45"
+            onClick={() => setEditing(null)}
+          >
+            <div
+              className="w-[680px] max-w-[94vw] rounded-[14px] border border-gray-200 bg-white p-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="mb-[10px] text-[16px] font-extrabold text-slate-900">
+                Edit Employee
+              </div>
 
-              <div className="vvEmp-modalGrid">
+              <div className="grid grid-cols-1 gap-[10px] md:grid-cols-2">
                 <input
+                  className={editInputClass}
                   placeholder="Staff ID"
                   value={editForm.employeeId}
                   onChange={(e) =>
@@ -462,6 +586,7 @@ function Employees() {
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Name"
                   value={editForm.name}
                   onChange={(e) =>
@@ -469,6 +594,7 @@ function Employees() {
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Department"
                   value={editForm.department}
                   onChange={(e) =>
@@ -476,6 +602,7 @@ function Employees() {
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Designation"
                   value={editForm.designation}
                   onChange={(e) =>
@@ -483,8 +610,8 @@ function Employees() {
                   }
                 />
 
-                {/* ✅ FIX: gender dropdown */}
                 <select
+                  className={`${editInputClass} text-slate-500`}
                   value={editForm.gender}
                   onChange={(e) =>
                     setEditForm({ ...editForm, gender: e.target.value })
@@ -498,12 +625,14 @@ function Employees() {
 
                 <input
                   type="date"
+                  className={`${editInputClass} text-slate-500`}
                   value={editForm.dob}
                   onChange={(e) =>
                     setEditForm({ ...editForm, dob: e.target.value })
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Address"
                   value={editForm.address}
                   onChange={(e) =>
@@ -511,6 +640,7 @@ function Employees() {
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Contact"
                   value={editForm.mobile}
                   onChange={(e) =>
@@ -518,6 +648,7 @@ function Employees() {
                   }
                 />
                 <input
+                  className={editInputClass}
                   placeholder="Mail"
                   value={editForm.email}
                   onChange={(e) =>
@@ -526,16 +657,16 @@ function Employees() {
                 />
               </div>
 
-              <div className="vvEmp-modalActions">
+              <div className="mt-3 flex justify-end gap-[10px]">
                 <button
-                  className="vvEmp-btn primary"
+                  className="h-[44px] rounded-[10px] bg-slate-900 px-[14px] font-bold text-white"
                   onClick={saveEdit}
                   type="button"
                 >
                   Save
                 </button>
                 <button
-                  className="vvEmp-btn"
+                  className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
                   onClick={() => setEditing(null)}
                   type="button"
                 >

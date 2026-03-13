@@ -3,7 +3,6 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
-import "./Dashboard.css";
 import Schedules from "./Schedules";
 
 const pad2 = (n) => String(n).padStart(2, "0");
@@ -60,6 +59,16 @@ const statusFromNow = (dateValue, fromTime, toTime) => {
   if (now >= start && now <= end) return "active";
   if (now > end) return "completed";
   return "inactive";
+};
+
+const getStatusClasses = (status) => {
+  if (status === "active") {
+    return "bg-green-100 text-green-700";
+  }
+  if (status === "completed") {
+    return "bg-orange-100 text-orange-700";
+  }
+  return "bg-red-100 text-red-700";
 };
 
 function Dashboard() {
@@ -174,233 +183,154 @@ function Dashboard() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="vvDash-page">
+      <div className="h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
         {user?.role === "admin" ? (
           <>
             <Schedules />
-
-            <div className="vvDash-cards">
-              <div className="vvDash-card">
-                <div className="vvDash-cardLabel">Total Employees</div>
-                <div className="vvDash-cardValue">
-                  {adminData.totalEmployees}
-                </div>
-              </div>
-
-              <div className="vvDash-card">
-                <div className="vvDash-cardLabel">Today Present</div>
-                <div className="vvDash-cardValue">{adminData.todayPresent}</div>
-              </div>
-
-              <div className="vvDash-card">
-                <div className="vvDash-cardLabel">Today Shifts</div>
-                <div className="vvDash-cardValue">{adminData.todayShifts}</div>
-              </div>
-            </div>
-
-            <div className="vvDash-tableWrap">
-              <h2 className="emp-title">Latest Schedules</h2>
-
-              <table className="vvDash-table">
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Employee</th>
-                    <th>Staff ID</th>
-                    <th>From</th>
-                    <th>To</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {rows.length === 0 ? (
-                    <tr>
-                      <td colSpan="6" style={{ textAlign: "center" }}>
-                        No schedules found
-                      </td>
-                    </tr>
-                  ) : (
-                    rows.map((item) => {
-                      const fromTime = item.startTime || item.fromTime;
-                      const toTime = item.endTime || item.toTime;
-                      const employee = item.employee || item.user || {};
-
-                      return (
-                        <tr key={item._id}>
-                          <td>{formatDDMMYYYY(item.date)}</td>
-                          <td>{employee.name || "-"}</td>
-                          <td>{employee.employeeId || "-"}</td>
-                          <td>{formatAMPM(fromTime)}</td>
-                          <td>{formatAMPM(toTime)}</td>
-                          <td>
-                            <span
-                              className={`status-pill ${statusFromNow(
-                                item.date,
-                                fromTime,
-                                toTime
-                              )}`}
-                            >
-                              {statusFromNow(item.date, fromTime, toTime)}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
           </>
         ) : (
           <>
-            <div className="vvDash-cards">
-              <div className="vvDash-card">
-                <div className="vvDash-cardLabel">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="mt-8 text-[20px] font-extrabold text-slate-900">
+                Dashboard
+              </div>
+
+              <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+                <span className="text-[13px] font-bold text-slate-900">
+                  Welcome, {user?.name} !
+                </span>
+              </div>
+            </div>
+            <div className="sticky top-[52px] z-40 grid grid-cols-1 gap-[14px] bg-slate-100 pb-[14px] md:grid-cols-3">
+              <div className="rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)] md:col-span-1">
+                <div className="text-[14px] font-semibold text-slate-500">
                   Total Working Hours (This Week)
                 </div>
-                <div className="vvDash-cardValue">
+
+                <div className="mt-[6px] text-[26px] font-extrabold text-slate-900">
                   {empData.totalHours || "0.00"}
                 </div>
               </div>
             </div>
 
-            <div className="emp-page">
-              <h2 className="emp-title">My Profile</h2>
+            <div className="min-h-screen overflow-y-hidden bg-slate-100 p-7 font-['Poppins',Arial,sans-serif]">
+              <h2 className="mb-[14px] text-[22px] font-semibold text-slate-900">
+                My Profile
+              </h2>
 
-              <div className="profile-card">
-                <div className="profile-left">
+              <div className="grid max-w-[1200px] grid-cols-1 gap-[18px] rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.08)] md:grid-cols-[140px_1fr]">
+                <div className="flex items-start justify-center pt-[6px] md:justify-center">
                   <img
-                    className="profile-img"
+                    className="h-[150px] w-[150px] rounded-[12px] border border-gray-200 bg-slate-100 object-cover"
                     src={`/photos/${empData.user?.employeeId}.png`}
                     onError={(e) => (e.target.src = "/default-profile.png")}
                     alt="Profile"
                   />
                 </div>
 
-                <div className="profile-right">
-                  <div className="profile-header">
-                    <div className="profile-name">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-[10px] text-[20px] font-semibold text-slate-900">
                       {empData.user?.name || "-"}
-                      <span className="status-dot" title="Active" />
+                      <span
+                        className="inline-block h-[10px] w-[10px] rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                        title="Active"
+                      />
                     </div>
                   </div>
 
-                  <div className="profile-grid">
-                    <div className="field">
-                      <div className="label">Staff Name</div>
-                      <div className="value">{empData.user?.name || "-"}</div>
+                  <div className="grid grid-cols-1 gap-y-[30px] gap-x-[25px] md:grid-cols-3">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Staff Name
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
+                        {empData.user?.name || "-"}
+                      </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Staff ID</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Staff ID
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.employeeId || "-"}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Department</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Department
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.department || "-"}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Designation</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Designation
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.designation || "-"}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Email</div>
-                      <div className="value">{empData.user?.email || "-"}</div>
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Email
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
+                        {empData.user?.email || "-"}
+                      </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Mobile</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] text-slate-500">
+                        Mobile
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.mobile || "-"}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Gender</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Gender
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.gender || "-"}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Date of Birth</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Date of Birth
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {formatDDMMYYYY(empData.user?.dob)}
                       </div>
                     </div>
 
-                    <div className="field">
-                      <div className="label">Total Hours (This Week)</div>
-                      <div className="value">
+                    <div>
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Total Hours (This Week)
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.totalHours || "0.00"}
                       </div>
                     </div>
 
-                    <div className="field full">
-                      <div className="label">Address</div>
-                      <div className="value">
+                    <div className="md:col-span-3">
+                      <div className="mb-2 text-[15px] font-medium text-slate-500">
+                        Address
+                      </div>
+                      <div className="text-[14px] font-medium text-slate-900">
                         {empData.user?.address || "-"}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="vvDash-tableWrap">
-                <h2 className="emp-title">My Schedules</h2>
-
-                <table className="vvDash-table">
-                  <thead>
-                    <tr>
-                      <th>Date</th>
-                      <th>From</th>
-                      <th>To</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows.length === 0 ? (
-                      <tr>
-                        <td colSpan="4" style={{ textAlign: "center" }}>
-                          No schedules found
-                        </td>
-                      </tr>
-                    ) : (
-                      rows.map((item) => {
-                        const fromTime = item.startTime || item.fromTime;
-                        const toTime = item.endTime || item.toTime;
-
-                        return (
-                          <tr key={item._id}>
-                            <td>{formatDDMMYYYY(item.date)}</td>
-                            <td>{formatAMPM(fromTime)}</td>
-                            <td>{formatAMPM(toTime)}</td>
-                            <td>
-                              <span
-                                className={`status-pill ${statusFromNow(
-                                  item.date,
-                                  fromTime,
-                                  toTime
-                                )}`}
-                              >
-                                {statusFromNow(item.date, fromTime, toTime)}
-                              </span>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
               </div>
             </div>
           </>

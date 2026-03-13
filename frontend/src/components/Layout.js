@@ -1,12 +1,13 @@
 import React from "react";
 import Sidebar from "./Sidebar";
-import "./Layout.css";
 
 function Layout({ children }) {
   return (
-    <div className="layout">
+    <div className="flex h-screen overflow-hidden">
       <Sidebar />
-      <div className="layout-content">{children}</div>
+      <div className="flex-1 overflow-hidden bg-slate-100 p-0">
+        {children}
+      </div>
     </div>
   );
 }

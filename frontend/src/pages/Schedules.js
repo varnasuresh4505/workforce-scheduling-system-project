@@ -1,8 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Layout from "../components/Layout";
-import "./Schedules.css";
 import {
   FiPlus,
   FiX,
@@ -50,6 +48,12 @@ const getShiftStatus = (dateStr, fromTime, toTime) => {
   }
 };
 
+const getStatusClass = (status) => {
+  if (status === "active") return "bg-green-100 text-green-700";
+  if (status === "completed") return "bg-orange-100 text-orange-700";
+  return "bg-red-100 text-red-700";
+};
+
 function Schedules() {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem("userInfo"));
@@ -57,14 +61,9 @@ function Schedules() {
   const [employees, setEmployees] = useState([]);
   const [schedules, setSchedules] = useState([]);
   const [search, setSearch] = useState("");
-
-  // modal
   const [open, setOpen] = useState(false);
-
-  // toast
   const [toast, setToast] = useState({ show: false, type: "success", msg: "" });
 
-  // top stats
   const [stats, setStats] = useState({
     totalEmployees: 0,
     todayPresent: 0,
@@ -97,7 +96,9 @@ function Schedules() {
 
   const showToast = (type, msg) => {
     setToast({ show: true, type, msg });
-    setTimeout(() => setToast({ show: false, type: "success", msg: "" }), 2500);
+    setTimeout(() => {
+      setToast({ show: false, type: "success", msg: "" });
+    }, 2500);
   };
 
   const fetchEmployees = async () => {
@@ -105,7 +106,7 @@ function Schedules() {
       const res = await axios.get("http://localhost:5000/api/employees", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setEmployees(res.data);
+      setEmployees(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       showToast("error", "Failed to fetch employees");
     }
@@ -116,7 +117,7 @@ function Schedules() {
       const res = await axios.get("http://localhost:5000/api/schedules", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setSchedules(res.data);
+      setSchedules(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       showToast("error", "Failed to fetch schedules");
     }
@@ -141,7 +142,6 @@ function Schedules() {
       });
 
       const todayShifts = todaySchedules.length;
-
       let todayPresent = totalEmployees;
 
       try {
@@ -176,7 +176,7 @@ function Schedules() {
 
         todayPresent = Math.max(0, totalEmployees - leaveEmpSet.size);
       } catch {
-        // ignore
+        // ignore leave stats error
       }
 
       setStats({ totalEmployees, todayPresent, todayShifts });
@@ -236,26 +236,29 @@ function Schedules() {
     }
   };
 
-  // ✅ UPDATED: add search filter + status mapping
   const tableRows = useMemo(() => {
     const q = search.trim().toLowerCase();
 
     return schedules
       .map((s) => {
-        const status = getShiftStatus(s.date, s.fromTime, s.toTime);
-        return { ...s, status };
+        const fromTime = s.fromTime || s.startTime;
+        const toTime = s.toTime || s.endTime;
+        const status = getShiftStatus(s.date, fromTime, toTime);
+        return { ...s, fromTime, toTime, status };
       })
       .filter((s) => {
         if (!q) return true;
 
         const haystack = [
+          s.employee?.employeeId,
           s.employeeId,
+          s.employee?.name,
           s.employeeName,
           s.department,
           s.designation,
-          s.employeeEmail, // if backend sends
-          s.email, // if backend sends
-          s.status, // active/completed/inactive
+          s.employeeEmail,
+          s.email,
+          s.status,
           formatDateDDMMYYYY(s.date),
           `${s.fromTime}-${s.toTime}`,
         ]
@@ -268,225 +271,343 @@ function Schedules() {
   }, [schedules, search]);
 
   return (
-    
-      <div className="vvSched-page">
-        {/* ✅ TOP FIXED HEADER AREA */}
-        <div className="vvSched-fixedTop">
-          {/* Welcome */}
-          <div className="vvSched-welcomeRow">
-            <div className="vvSched-welcomeTitle">Schedules</div>
-            <div className="vvSched-welcomeRight">
-              
-              <span className="vvSched-welcomeName">Welcome, {user?.name} !</span>
-            </div>
+    <div className="min-h-screen bg-slate-100 p-[26px] font-['Poppins',sans-serif]">
+      <div className="sticky top-0 z-40 bg-slate-100 pb-[14px] pt-[2px]">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="m-0 text-[20px] font-extrabold text-slate-900">
+            Schedules
           </div>
 
-          {/* Cards */}
-          <div className="vvSched-cards">
-            <div className="vvSched-cardMini">
-              <div className="vvSched-cardLabel">Total Employees</div>
-              <div className="vvSched-cardValue">{stats.totalEmployees}</div>
-            </div>
-
-            <div className="vvSched-cardMini">
-              <div className="vvSched-cardLabel">Today Present</div>
-              <div className="vvSched-cardValue">{stats.todayPresent}</div>
-            </div>
-
-            <div className="vvSched-cardMini">
-              <div className="vvSched-cardLabel">Today Shifts</div>
-              <div className="vvSched-cardValue">{stats.todayShifts}</div>
-            </div>
-          </div>
-
-          {/* Create Button */}
-          <div className="vvSched-actionsRow">
-            <button className="vvSched-addBtn" onClick={openModal} type="button">
-              <FiPlus /> Create Schedule
-            </button>
+          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+            <span className="text-[13px] font-bold text-slate-900">
+              Welcome, {user?.name} !
+            </span>
           </div>
         </div>
 
-        {/* ✅ SEARCH */}
-        <div className="vvEmp-searchRow">
-          <FiSearch className="vvEmp-searchIcon" />
-          <input
-            className="vvEmp-searchInput"
-            placeholder="Search staff id / name / dept / designation / email..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* ✅ TABLE CARD */}
-        <div className="vvSched-card">
-          <div className="vvSched-cardHead">
-            <h3 className="vvSched-cardTitle">Schedule List</h3>
-
-            {/* ✅ UPDATED: show filtered count */}
-            <span className="vvSched-badge">{tableRows.length} Records</span>
+        <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+            <div className="text-[14px] font-extrabold text-slate-500">
+              Total Employees
+            </div>
+            <div className="mt-[6px] text-[22px] font-bold text-slate-900">
+              {stats.totalEmployees}
+            </div>
           </div>
 
-          <div className="vvSched-tableWrap">
-            <table className="vvSched-table">
-              <thead>
-                <tr>
-                  <th>Staff ID</th>
-                  <th>Name</th>
-                  <th>Department</th>
-                  <th>Designation</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                  <th>Status</th>
+          <div className="rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+            <div className="text-[14px] font-extrabold text-slate-500">
+              Today Present
+            </div>
+            <div className="mt-[6px] text-[22px] font-bold text-slate-900">
+              {stats.todayPresent}
+            </div>
+          </div>
+
+          <div className="rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+            <div className="text-[14px] font-extrabold text-slate-500">
+              Today Shifts
+            </div>
+            <div className="mt-[6px] text-[22px] font-bold text-slate-900">
+              {stats.todayShifts}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            className="inline-flex h-[44px] items-center gap-2 rounded-[12px] bg-slate-900 px-4 font-semibold text-white transition duration-200 hover:-translate-y-[1px] hover:bg-slate-800"
+            onClick={openModal}
+            type="button"
+          >
+            <FiPlus />
+            Create Schedule
+          </button>
+        </div>
+      </div>
+
+      <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-gray-200 bg-white px-[14px] py-3 shadow-[0px_6px_18px_rgba(15,23,42,0.06)] focus-within:border-slate-900 focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]">
+        <FiSearch className="text-[18px] text-slate-500" />
+        <input
+          className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
+          placeholder="Search staff id / name / dept / designation / email..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
+
+      <div className="rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
+        <div className="mb-[10px] flex items-center justify-between">
+          <h3 className="m-0 text-[16px] font-semibold text-slate-900">
+            Schedule List
+          </h3>
+
+          <span className="rounded-full bg-slate-100 px-[10px] py-[6px] text-[12px] text-slate-500">
+            {tableRows.length} Records
+          </span>
+        </div>
+
+        <div className="max-h-[320px] overflow-y-auto rounded-[12px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <table className="min-w-[900px] w-full border-collapse">
+            <thead>
+              <tr>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Staff ID
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Name
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Department
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Designation
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Date
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Time
+                </th>
+                <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  Status
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {tableRows.map((s, index) => (
+                <tr key={s._id}>
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {s.employee?.employeeId || s.employeeId || "-"}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {s.employee?.name || s.employeeName || "-"}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {s.department || "-"}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {s.designation || "-"}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {formatDateDDMMYYYY(s.date)}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    {formatTimeAMPM(s.fromTime)} - {formatTimeAMPM(s.toTime)}
+                  </td>
+
+                  <td
+                    className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                      index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                    }`}
+                  >
+                    <span
+                      className={`inline-block rounded-full px-[10px] py-[6px] text-[12px] font-bold capitalize ${getStatusClass(
+                        s.status
+                      )}`}
+                    >
+                      {s.status}
+                    </span>
+                  </td>
                 </tr>
-              </thead>
+              ))}
 
-              <tbody>
-                {tableRows.map((s) => (
-                  <tr key={s._id}>
-                    <td>{s.employee?.employeeId || s.employeeId}</td>
-                    <td>{s.employee?.name || s.employeeName}</td>
-                    <td>{s.department || "-"}</td>
-                    <td>{s.designation || "-"}</td>
-                    <td>{formatDateDDMMYYYY(s.date)}</td>
-                    <td>
-                      {formatTimeAMPM(s.fromTime)} - {formatTimeAMPM(s.toTime)}
-                    </td>
-                    <td>
-                      <span className={`vvSched-status ${s.status}`}>
-                        {s.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-
-                {tableRows.length === 0 && (
-                  <tr>
-                    <td colSpan="7" className="vvSched-empty">
-                      No schedules found
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+              {tableRows.length === 0 && (
+                <tr>
+                  <td
+                    colSpan="7"
+                    className="px-[18px] py-[18px] text-center text-slate-500"
+                  >
+                    No schedules found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+      </div>
 
-        {/* ✅ MODAL */}
-        {open && (
-          <div className="vvSched-modalOverlay">
-            <div className="vvSched-modal">
-              <div className="vvSched-modalHead">
-                <h3>Create Schedule</h3>
-                <button
-                  className="vvSched-closeBtn"
-                  onClick={() => setOpen(false)}
-                  type="button"
+      {open && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center bg-black/45">
+          <div className="w-[680px] max-w-[92vw] rounded-[16px] border border-gray-200 bg-white p-[18px] shadow-[0px_20px_60px_rgba(15,23,42,0.2)]">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[20px] font-semibold text-slate-900">
+                Create Schedule
+              </h3>
+              <button
+                className="grid h-[38px] w-[38px] place-items-center rounded-[12px] border border-gray-200 bg-slate-50 text-[18px] transition hover:bg-indigo-50"
+                onClick={() => setOpen(false)}
+                type="button"
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <form
+              className="mt-[14px] grid grid-cols-1 gap-3 md:grid-cols-2"
+              onSubmit={createSchedule}
+            >
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  Staff ID
+                </label>
+                <select
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]"
+                  value={form.employeeId}
+                  onChange={(e) => handleEmpIdChange(e.target.value)}
+                  required
                 >
-                  <FiX />
-                </button>
+                  <option value="">Select Staff</option>
+                  {employees.map((emp) => (
+                    <option key={emp._id} value={emp.employeeId}>
+                      {emp.employeeId} - {emp.name}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <form className="vvSched-modalGrid" onSubmit={createSchedule}>
-                <div className="vvSched-field">
-                  <label>Staff ID</label>
-                  <select
-                    value={form.employeeId}
-                    onChange={(e) => handleEmpIdChange(e.target.value)}
-                    required
-                  >
-                    <option value="">Select Staff</option>
-                    {employees.map((emp) => (
-                      <option key={emp._id} value={emp.employeeId}>
-                        {emp.employeeId} - {emp.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  Name
+                </label>
+                <input
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none"
+                  value={form.employeeName}
+                  readOnly
+                  placeholder="Name"
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>Name</label>
-                  <input value={form.employeeName} readOnly placeholder="Name" />
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  Department
+                </label>
+                <input
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none"
+                  value={form.department}
+                  readOnly
+                  placeholder="Department"
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>Department</label>
-                  <input
-                    value={form.department}
-                    readOnly
-                    placeholder="Department"
-                  />
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  Designation
+                </label>
+                <input
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none"
+                  value={form.designation}
+                  readOnly
+                  placeholder="Designation"
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>Designation</label>
-                  <input
-                    value={form.designation}
-                    readOnly
-                    placeholder="Designation"
-                  />
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]"
+                  value={form.date}
+                  onChange={(e) => setForm({ ...form, date: e.target.value })}
+                  required
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>Date</label>
-                  <input
-                    type="date"
-                    value={form.date}
-                    onChange={(e) => setForm({ ...form, date: e.target.value })}
-                    required
-                  />
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  From
+                </label>
+                <input
+                  type="time"
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]"
+                  value={form.fromTime}
+                  onChange={(e) =>
+                    setForm({ ...form, fromTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>From</label>
-                  <input
-                    type="time"
-                    value={form.fromTime}
-                    onChange={(e) =>
-                      setForm({ ...form, fromTime: e.target.value })
-                    }
-                    required
-                  />
-                </div>
+              <div className="flex flex-col gap-[6px]">
+                <label className="text-[13px] font-medium text-slate-600">
+                  To
+                </label>
+                <input
+                  type="time"
+                  className="h-[44px] rounded-[12px] border border-slate-300 bg-white px-3 text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]"
+                  value={form.toTime}
+                  onChange={(e) =>
+                    setForm({ ...form, toTime: e.target.value })
+                  }
+                  required
+                />
+              </div>
 
-                <div className="vvSched-field">
-                  <label>To</label>
-                  <input
-                    type="time"
-                    value={form.toTime}
-                    onChange={(e) =>
-                      setForm({ ...form, toTime: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="vvSched-actions">
-                  <button className="vvSched-saveBtn" type="submit">
-                    Save Schedule
-                  </button>
-                  <button
-                    className="vvSched-cancelBtn"
-                    type="button"
-                    onClick={() => setOpen(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="col-span-1 mt-[6px] flex justify-end gap-[10px] md:col-span-2">
+                <button
+                  className="h-[44px] rounded-[12px] bg-slate-900 px-[18px] font-semibold text-white transition hover:bg-slate-800"
+                  type="submit"
+                >
+                  Save Schedule
+                </button>
+                <button
+                  className="h-[44px] rounded-[12px] bg-slate-400 px-[18px] font-semibold text-white transition hover:bg-slate-500"
+                  type="button"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* ✅ TOAST */}
-        {toast.show && (
-          <div className={`vvToast ${toast.type}`}>
-            {toast.type === "success" ? <FiCheckCircle /> : <FiAlertCircle />}
-            <span>{toast.msg}</span>
-          </div>
-        )}
-      </div>
-    
+      {toast.show && (
+        <div
+          className={`fixed bottom-[18px] right-[18px] z-[2000] flex items-center gap-[10px] rounded-[14px] px-[14px] py-3 font-semibold shadow-[0px_12px_30px_rgba(15,23,42,0.2)] ${
+            toast.type === "success"
+              ? "border border-green-200 bg-green-100 text-green-700"
+              : "border border-red-200 bg-red-100 text-red-700"
+          }`}
+        >
+          {toast.type === "success" ? <FiCheckCircle /> : <FiAlertCircle />}
+          <span>{toast.msg}</span>
+        </div>
+      )}
+    </div>
   );
 }
 
