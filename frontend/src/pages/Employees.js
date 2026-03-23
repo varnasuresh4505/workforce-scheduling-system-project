@@ -11,8 +11,11 @@ function Employees() {
 
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState("");
-
-  const [pop, setPop] = useState({ open: false, type: "success", message: "" });
+  const [pop, setPop] = useState({
+    open: false,
+    type: "success",
+    message: "",
+  });
 
   const [addOpen, setAddOpen] = useState(false);
   const [form, setForm] = useState({
@@ -44,8 +47,16 @@ function Employees() {
   });
 
   useEffect(() => {
-    if (!user) return navigate("/");
-    if (user.role !== "admin") return navigate("/dashboard");
+    if (!user) {
+      navigate("/");
+      return;
+    }
+
+    if (user.role !== "admin") {
+      navigate("/dashboard");
+      return;
+    }
+
     fetchEmployees();
     // eslint-disable-next-line
   }, []);
@@ -54,9 +65,11 @@ function Employees() {
     try {
       const res = await axios.get(
         "http://localhost:5000/api/employees/with-hours",
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
       );
-      setEmployees(res.data);
+      setEmployees(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setPop({
         open: true,
@@ -81,6 +94,15 @@ function Employees() {
     });
   }, [employees, search]);
 
+  const groupedEmployees = useMemo(() => {
+    return filtered.reduce((acc, emp) => {
+      const dept = emp.department?.trim() || "No Department";
+      if (!acc[dept]) acc[dept] = [];
+      acc[dept].push(emp);
+      return acc;
+    }, {});
+  }, [filtered]);
+
   const openAdd = () => {
     setForm({
       employeeId: "",
@@ -103,6 +125,7 @@ function Employees() {
       await axios.post("http://localhost:5000/api/employees", form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
+
       setAddOpen(false);
       setPop({
         open: true,
@@ -140,8 +163,11 @@ function Employees() {
       await axios.put(
         `http://localhost:5000/api/employees/${editing._id}`,
         editForm,
-        { headers: { Authorization: `Bearer ${user.token}` } }
+        {
+          headers: { Authorization: `Bearer ${user.token}` },
+        }
       );
+
       setEditing(null);
       setPop({
         open: true,
@@ -161,11 +187,17 @@ function Employees() {
   const removeEmployee = async (id) => {
     const ok = window.confirm("Delete this employee?");
     if (!ok) return;
+
     try {
       await axios.delete(`http://localhost:5000/api/employees/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setPop({ open: true, type: "success", message: "Employee deleted ✅" });
+
+      setPop({
+        open: true,
+        type: "success",
+        message: "Employee deleted ✅",
+      });
       fetchEmployees();
     } catch (err) {
       setPop({
@@ -177,6 +209,7 @@ function Employees() {
   };
 
   const pad2 = (n) => String(n).padStart(2, "0");
+
   const formatDDMMYYYY = (dateValue) => {
     if (!dateValue) return "-";
     const d = new Date(dateValue);
@@ -199,7 +232,7 @@ function Employees() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
+      <div className="mt-[52px] h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
         <div className="sticky top-0 z-50 flex items-center justify-between bg-slate-100 pb-[14px] pt-[25px]">
           <div>
             <div className="m-0 text-[20px] font-extrabold text-slate-900">
@@ -221,159 +254,189 @@ function Employees() {
         </div>
 
         <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-gray-200 bg-white px-[14px] py-3 shadow-[0px_6px_18px_rgba(15,23,42,0.06)] focus-within:border-slate-900 focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]">
-                <FiSearch className="text-[18px] text-slate-500" />
-                <input
-                  className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
-                  placeholder="Search staff id / name / dept / designation / email..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-              </div>
+          <FiSearch className="text-[18px] text-slate-500" />
+          <input
+            className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
+            placeholder="Search staff id / name / dept / designation / email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
-        <div className="h-[calc(100vh-140px)] overflow-auto pr-[2px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {filtered.map((u) => (
-            <div
-              key={u._id}
-              className="mb-[14px] grid grid-cols-1 items-start gap-[30px] rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.08)] lg:grid-cols-[140px_1fr]"
-            >
-              <div className="flex items-start justify-center pt-[10px]">
-                <img
-                  className="h-[120px] w-[120px] rounded-[12px] border border-gray-200 bg-slate-100 object-cover"
-                  src={`/photos/${u.employeeId}.png`}
-                  onError={(e) => (e.target.src = "/default-profile.png")}
-                  alt="Profile"
-                />
-              </div>
+        {filtered.length > 0 && (
+          <div className="mb-4 flex flex-wrap gap-3">
+            
+          </div>
+        )}
 
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-[10px]">
-                    <div className="text-[18px] font-bold text-slate-900">
-                      {u.name}
-                    </div>
-                    <span
-                      className="inline-block h-[10px] w-[10px] rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
-                      title="Active"
-                    />
-                  </div>
-
-                  <div className="flex gap-2">
-                    <button
-                      className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:bg-indigo-50"
-                      onClick={() => openEdit(u)}
-                      type="button"
-                    >
-                      <FiEdit2 />
-                    </button>
-                    <button
-                      className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700"
-                      onClick={() => removeEmployee(u._id)}
-                      type="button"
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-x-[18px] gap-y-5 md:grid-cols-2 xl:grid-cols-3">
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Staff ID
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.employeeId || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Staff Name
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.name || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Department
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.department || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Designation
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.designation || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Email
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.email || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Contact
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.mobile || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Gender
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.gender || "-"}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Date of Birth
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {formatDDMMYYYY(u.dob)}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Total Hours (This Week)
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-2 xl:col-span-3">
-                    <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                      Address
-                    </div>
-                    <div className="text-[14px] font-medium text-slate-900">
-                      {u.address || "-"}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-
-          {filtered.length === 0 && (
+        <div className="h-[calc(100vh-190px)] overflow-auto pr-[2px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {filtered.length === 0 ? (
             <div className="rounded-[14px] border border-dashed border-slate-300 bg-white p-4 text-center text-slate-500">
               No employees found
             </div>
+          ) : (
+            Object.entries(groupedEmployees).map(([department, deptEmployees]) => (
+              <div
+                key={department}
+                className="mb-6 rounded-[18px] border border-slate-200 bg-white/70 p-4 shadow-[0px_8px_24px_rgba(15,23,42,0.06)]"
+              >
+                <div className="mb-4 flex items-center justify-between rounded-[14px] bg-slate-900 px-4 py-3 text-white">
+                  <div>
+                    <div className="text-[18px] font-bold">{department}</div>
+                    <div className="text-[12px] text-slate-300">
+                      Department wise employee list
+                    </div>
+                  </div>
+
+                  <div className="rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold">
+                    {deptEmployees.length} Employee
+                    {deptEmployees.length > 1 ? "s" : ""}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  {deptEmployees.map((u) => (
+                    <div
+                      key={u._id}
+                      className="grid grid-cols-1 items-start gap-[30px] rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.08)] lg:grid-cols-[140px_1fr]"
+                    >
+                      <div className="flex items-start justify-center pt-[10px]">
+                        <img
+                          className="h-[120px] w-[120px] rounded-[12px] border border-gray-200 bg-slate-100 object-cover"
+                          src={`/photos/${u.employeeId}.png`}
+                          onError={(e) => (e.target.src = "/default-profile.png")}
+                          alt="Profile"
+                        />
+                      </div>
+
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-[10px]">
+                            <div className="text-[18px] font-bold text-slate-900">
+                              {u.name}
+                            </div>
+                            <span
+                              className="inline-block h-[10px] w-[10px] rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
+                              title="Active"
+                            />
+                          </div>
+
+                          <div className="flex gap-2">
+                            <button
+                              className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:bg-indigo-50"
+                              onClick={() => openEdit(u)}
+                              type="button"
+                            >
+                              <FiEdit2 />
+                            </button>
+
+                            <button
+                              className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700"
+                              onClick={() => removeEmployee(u._id)}
+                              type="button"
+                            >
+                              <FiTrash2 />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-x-[18px] gap-y-5 md:grid-cols-2 xl:grid-cols-3">
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Staff ID
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.employeeId || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Staff Name
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.name || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Department
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.department || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Designation
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.designation || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Email
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.email || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Contact
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.mobile || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Gender
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.gender || "-"}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Date of Birth
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {formatDDMMYYYY(u.dob)}
+                            </div>
+                          </div>
+
+                          <div>
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Total Hours (This Week)
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
+                            </div>
+                          </div>
+
+                          <div className="md:col-span-2 xl:col-span-3">
+                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
+                              Address
+                            </div>
+                            <div className="text-[14px] font-medium text-slate-900">
+                              {u.address || "-"}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))
           )}
         </div>
 
@@ -390,7 +453,6 @@ function Employees() {
                 <h3 className="m-0 text-[20px] font-extrabold text-slate-900">
                   Add Employee
                 </h3>
-
                 <button
                   className="h-[44px] w-[44px] rounded-[14px] border border-gray-200 bg-slate-50 text-[18px] text-slate-900 transition hover:bg-indigo-50"
                   onClick={() => setAddOpen(false)}
@@ -551,6 +613,7 @@ function Employees() {
                 >
                   Create
                 </button>
+
                 <button
                   className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
                   onClick={() => setAddOpen(false)}
@@ -572,7 +635,7 @@ function Employees() {
               className="w-[680px] max-w-[94vw] rounded-[14px] border border-gray-200 bg-white p-4"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-[10px] text-[16px] font-extrabold text-slate-900">
+              <div className="mb-[10px] text-[16px] font-extrabold text-slate-800">
                 Edit Employee
               </div>
 
@@ -585,6 +648,7 @@ function Employees() {
                     setEditForm({ ...editForm, employeeId: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Name"
@@ -593,6 +657,7 @@ function Employees() {
                     setEditForm({ ...editForm, name: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Department"
@@ -601,6 +666,7 @@ function Employees() {
                     setEditForm({ ...editForm, department: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Designation"
@@ -631,6 +697,7 @@ function Employees() {
                     setEditForm({ ...editForm, dob: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Address"
@@ -639,6 +706,7 @@ function Employees() {
                     setEditForm({ ...editForm, address: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Contact"
@@ -647,6 +715,7 @@ function Employees() {
                     setEditForm({ ...editForm, mobile: e.target.value })
                   }
                 />
+
                 <input
                   className={editInputClass}
                   placeholder="Mail"
@@ -665,6 +734,7 @@ function Employees() {
                 >
                   Save
                 </button>
+
                 <button
                   className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
                   onClick={() => setEditing(null)}

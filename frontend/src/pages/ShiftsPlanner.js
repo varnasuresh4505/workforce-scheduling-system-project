@@ -182,7 +182,7 @@ function ShiftsPlanner() {
     <Layout>
       <div className="flex h-full min-h-0 flex-col p-5 font-['Poppins',sans-serif]">
         <div className="mb-3 flex-none">
-          <div className="flex items-center justify-between gap-3">
+          <div className="mt-10 flex items-center justify-between gap-3">
             <h2 className="mt-7 text-[20px] font-extrabold text-slate-900">
               Shift Planner
             </h2>

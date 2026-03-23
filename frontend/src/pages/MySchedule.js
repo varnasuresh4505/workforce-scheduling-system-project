@@ -97,10 +97,7 @@ function MySchedule() {
         <div className="mb-[14px]">
           <div className="mb-3 mt-7 flex items-center justify-between">
             <div>
-              <h2 className="m-0 text-[20px] font-extrabold text-slate-900">
-                My Schedule
-              </h2>
-              <p className="mt-[6px] mb-0 text-[14px] text-slate-500">
+              <p className="mt-[25px] mb-0 text-[14px] text-slate-500">
                 View your assigned shifts
               </p>
             </div>

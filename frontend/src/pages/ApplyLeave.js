@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import Popup from "../components/Popup";
 
 const getStatusClass = (status) => {
   if (status === "approved") return "bg-green-100 text-green-700";
@@ -22,6 +23,11 @@ function ApplyLeave() {
   });
 
   const [myLeaves, setMyLeaves] = useState([]);
+  const [pop, setPop] = useState({
+    open: false,
+    type: "success",
+    message: "",
+  });
 
   useEffect(() => {
     if (!user) return navigate("/");
@@ -37,7 +43,11 @@ function ApplyLeave() {
       });
       setMyLeaves(res.data || []);
     } catch (err) {
-      alert("Failed to load leave data");
+      setPop({
+        open: true,
+        type: "error",
+        message: "Failed to load leave data",
+      });
     }
   };
 
@@ -49,7 +59,12 @@ function ApplyLeave() {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
-      alert("Leave Applied (Pending)");
+      setPop({
+        open: true,
+        type: "success",
+        message: "Leave Applied Successfully ✅ Status: Pending",
+      });
+
       setForm({
         fromDate: "",
         toDate: "",
@@ -57,9 +72,14 @@ function ApplyLeave() {
         endTime: "17:00",
         reason: "",
       });
+
       fetchMyLeaves();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to apply leave");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to apply leave",
+      });
     }
   };
 
@@ -84,14 +104,18 @@ function ApplyLeave() {
 
   return (
     <Layout>
+      <Popup
+        open={pop.open}
+        type={pop.type}
+        message={pop.message}
+        onClose={() => setPop({ ...pop, open: false })}
+      />
+
       <div className="min-h-screen bg-slate-100 p-[26px] font-['Poppins',sans-serif]">
         <div className="mb-[14px]">
           <div className="mb-3 flex items-center justify-between">
             <div>
-              <h2 className="mt-5 text-[20px] font-extrabold text-slate-900">
-                Apply Leave
-              </h2>
-              <p className="mt-[6px] mb-0 text-[14px] text-slate-500">
+              <p className="mt-[53px] mb-0 text-[14px] text-slate-500">
                 Select dates, time range, and submit your reason
               </p>
             </div>

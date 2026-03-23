@@ -183,7 +183,7 @@ function Dashboard() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
+      <div className="h-screen overflow-hidden bg-slate-100 px-[12px] py-[18px] font-['Poppins',sans-serif]">
         {user?.role === "admin" ? (
           <>
             <Schedules />
@@ -191,9 +191,7 @@ function Dashboard() {
         ) : (
           <>
             <div className="mb-3 flex items-center justify-between">
-              <div className="mt-8 text-[20px] font-extrabold text-slate-900">
-                Dashboard
-              </div>
+            
 
               <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
                 <span className="text-[13px] font-bold text-slate-900">
@@ -202,7 +200,7 @@ function Dashboard() {
               </div>
             </div>
             <div className="sticky top-[52px] z-40 grid grid-cols-1 gap-[14px] bg-slate-100 pb-[14px] md:grid-cols-3">
-              <div className="rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)] md:col-span-1">
+              <div className="mt-5 ml-7 rounded-[14px] border border-gray-200 bg-white p-[14px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)] md:col-span-1">
                 <div className="text-[14px] font-semibold text-slate-500">
                   Total Working Hours (This Week)
                 </div>
@@ -313,15 +311,6 @@ function Dashboard() {
                     </div>
 
                     <div>
-                      <div className="mb-2 text-[15px] font-medium text-slate-500">
-                        Total Hours (This Week)
-                      </div>
-                      <div className="text-[14px] font-medium text-slate-900">
-                        {empData.totalHours || "0.00"}
-                      </div>
-                    </div>
-
-                    <div className="md:col-span-3">
                       <div className="mb-2 text-[15px] font-medium text-slate-500">
                         Address
                       </div>

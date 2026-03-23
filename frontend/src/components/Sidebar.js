@@ -20,14 +20,34 @@ function Sidebar() {
     }`;
 
   return (
-    <div className="sticky top-0 flex h-screen w-[280px] flex-col overflow-hidden bg-slate-800 px-[20px] pr-[40px] py-[20px] text-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <h2 className="mb-[25px] mt-[28px] flex items-center justify-center gap-[10px] text-center text-[26px] font-bold">
-        <Hospital size={28} className="shrink-0" />
-        <span>SVT Hospital</span>
-      </h2>
+  <>
+    {/* Top Navbar */}
+    <div className="fixed top-0 left-0 w-full h-[70px] bg-slate-800 text-white flex items-center justify-between px-6 z-50 shadow-md">
+      <div className="flex items-center gap-2 font-semibold text-[22px]">
+        <Hospital size={42} />
+        <span>SVT  Hospital  Management  System</span>
+      </div>
 
-      <ul className="m-0 flex-1 list-none overflow-y-auto p-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <li className="mb-5">
+      <div className="flex items-center gap-7 text-sm">
+        <span>Welcome, {user?.name || "User"} 👋</span>
+
+        <button
+          className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded hover:bg-slate-600"
+          onClick={handleLogout}
+        >
+          <FaSignOutAlt />
+          Logout
+        </button>
+      </div>
+    </div>
+
+    {/* Sidebar */}
+    <div className="sticky top-[45px] flex h-[calc(100vh-45px)] w-[250px] flex-col overflow-hidden bg-slate-800 px-[20px] pr-[40px] py-[20px] text-white">
+
+      
+
+      <ul className="m-0 flex-1 list-none overflow-y-auto p-0">
+        <li className="mb-5 mt-10">
           <NavLink to="/dashboard" className={linkClass}>
             <FaCalendarAlt className="text-[20px]" />
             <span>Dashboard</span>
@@ -76,26 +96,17 @@ function Sidebar() {
             </li>
           </>
         )}
-
-        <li className="mb-5">
-          <button
-            className="flex w-full cursor-pointer items-center gap-[15px] rounded-[8px] border-none bg-transparent px-3 py-3 text-left text-[16px] text-white transition-colors"
-            onClick={handleLogout}
-          >
-            <FaSignOutAlt className="text-[20px]" />
-            <span>Logout</span>
-          </button>
-        </li>
       </ul>
 
-      <div className="mt-auto border-t border-white/20 pb-3 pt-3 text-center text-[14px] opacity-90">
+      <div className="mt-auto mb-0 border-t border-white/20 pb-3 pt-3 text-center text-[12px] opacity-90">
         <p className="m-0 font-semibold">💙 Caring Beyond Medicine 💙</p>
-        <small className="mt-[3px] mb-[15px] block text-[12px] text-slate-300">
+        <small className="mt-[3px] mb-[15px] block text-[11px] text-slate-300">
           Healing with Compassion & Trust
         </small>
       </div>
     </div>
-  );
+  </>
+);
 }
 
 export default Sidebar;

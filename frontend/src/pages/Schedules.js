@@ -278,11 +278,7 @@ function Schedules() {
             Schedules
           </div>
 
-          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-2 shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
-            <span className="text-[13px] font-bold text-slate-900">
-              Welcome, {user?.name} !
-            </span>
-          </div>
+          
         </div>
 
         <div className="mb-3 grid grid-cols-1 gap-3 md:grid-cols-3">
