@@ -93,49 +93,41 @@ function MySchedule() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="min-h-screen bg-slate-100 p-[26px] font-['Poppins',sans-serif]">
-        <div className="mb-[14px]">
-          <div className="mb-3 mt-7 flex items-center justify-between">
-            <div>
-              <p className="mt-[25px] mb-0 text-[14px] text-slate-500">
-                View your assigned shifts
-              </p>
-            </div>
-
-            
+      <div className="min-h-screen bg-slate-50 p-4 font-['Poppins',sans-serif]">
+        <div className="mb-4 flex items-center justify-between">
+          <div>
+            <h2 className="text-[20px] font-bold text-slate-900">My Schedule</h2>
+            <p className="mt-1 text-[13px] text-slate-500">
+              View your assigned shifts
+            </p>
           </div>
+
+          <span className="rounded-full bg-white px-3 py-1.5 text-[12px] font-medium text-slate-600 border border-slate-200">
+            {mySchedules.length} Records
+          </span>
         </div>
 
-        <div className="rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
-          <div className="mb-[10px] flex items-center justify-between">
-            <h3 className="m-0 text-[16px] font-semibold text-slate-900">
-              Schedule List
-            </h3>
-            <span className="rounded-full bg-slate-100 px-[10px] py-[6px] text-[12px] text-slate-500">
-              {mySchedules.length} Records
-            </span>
-          </div>
-
-          <div className="max-h-[500px] overflow-y-auto rounded-[12px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <table className="w-full min-w-[900px] border-collapse">
+        <div className="rounded-[14px] border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="max-h-[520px] overflow-y-auto rounded-[10px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <table className="w-full min-w-[860px] border-collapse text-sm">
               <thead>
                 <tr>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Staff ID
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Name
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Date
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Time
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Status
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left font-semibold text-white">
                     Assigned By
                   </th>
                 </tr>
@@ -150,7 +142,7 @@ function MySchedule() {
                   return (
                     <tr key={s._id}>
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
@@ -158,7 +150,7 @@ function MySchedule() {
                       </td>
 
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
@@ -166,7 +158,7 @@ function MySchedule() {
                       </td>
 
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
@@ -174,7 +166,7 @@ function MySchedule() {
                       </td>
 
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
@@ -182,12 +174,12 @@ function MySchedule() {
                       </td>
 
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
                         <span
-                          className={`inline-block rounded-full px-[10px] py-[6px] text-[12px] font-bold capitalize ${getStatusClass(
+                          className={`inline-block rounded-full px-[10px] py-[5px] text-[12px] font-semibold capitalize ${getStatusClass(
                             status
                           )}`}
                         >
@@ -196,7 +188,7 @@ function MySchedule() {
                       </td>
 
                       <td
-                        className={`border border-gray-200 px-3 py-3 text-[15px] text-slate-900 ${
+                        className={`border border-slate-200 px-3 py-3 text-slate-900 ${
                           index % 2 !== 0 ? "bg-slate-50" : "bg-white"
                         }`}
                       >
@@ -210,7 +202,7 @@ function MySchedule() {
                   <tr>
                     <td
                       colSpan="6"
-                      className="px-[18px] py-[18px] text-center text-slate-500"
+                      className="px-4 py-6 text-center text-slate-500"
                     >
                       No schedule assigned yet
                     </td>

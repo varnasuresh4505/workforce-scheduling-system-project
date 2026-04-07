@@ -1,7 +1,13 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaUsers, FaSignOutAlt, FaCalendarAlt, FaClipboardList, FaClock } from "react-icons/fa";
-import { Hospital } from "lucide-react";
+import {
+  FaUsers,
+  FaSignOutAlt,
+  FaCalendarAlt,
+  FaClipboardList,
+  FaClock,
+} from "react-icons/fa";
+import { HeartPulse } from "lucide-react";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -15,98 +21,109 @@ function Sidebar() {
   if (!user) return null;
 
   const linkClass = ({ isActive }) =>
-    `flex w-full cursor-pointer items-center gap-[15px] rounded-[8px] border-none px-3 py-3 text-left text-[16px] text-white no-underline transition-colors ${
-      isActive ? "bg-slate-700 font-bold" : "bg-transparent font-normal"
+    `flex items-center gap-3 rounded-xl px-4 py-3 text-[15px] font-medium transition-all duration-200 ${
+      isActive
+        ? "bg-white text-slate-900 shadow-sm"
+        : "text-slate-300 hover:bg-white/10 hover:text-white"
     }`;
 
   return (
-  <>
-    {/* Top Navbar */}
-    <div className="fixed top-0 left-0 w-full h-[70px] bg-slate-800 text-white flex items-center justify-between px-6 z-50 shadow-md">
-      <div className="flex items-center gap-2 font-semibold text-[22px]">
-        <Hospital size={42} />
-        <span>SVT  Hospital  Management  System</span>
-      </div>
+    <>
+      <header className="fixed left-0 top-0 z-50 flex h-[72px] w-full items-center justify-between border-b border-slate-200 bg-white px-6">
+        <div className="flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-slate-100 text-slate-800">
+            <HeartPulse size={23} />
+          </div>
 
-      <div className="flex items-center gap-7 text-sm">
-        <span>Welcome, {user?.name || "User"} 👋</span>
+          <div>
+            <h1 className="text-[18px] font-bold text-slate-900">
+              SVT Hospital
+            </h1>
+            <p className="text-[12px] text-slate-500">
+              Workforce Scheduling System
+            </p>
+          </div>
+        </div>
 
-        <button
-          className="flex items-center gap-2 bg-slate-700 px-3 py-1 rounded hover:bg-slate-600"
-          onClick={handleLogout}
-        >
-          <FaSignOutAlt />
-          Logout
-        </button>
-      </div>
-    </div>
+        <div className="flex items-center gap-4">
+          <div className="hidden text-right md:block">
+            <p className="text-[14px] font-semibold text-slate-900">
+              {user?.name || "User"}
+            </p>
+            <p className="text-[12px] capitalize text-slate-500">
+              {user?.role || "user"}
+            </p>
+          </div>
 
-    {/* Sidebar */}
-    <div className="sticky top-[45px] flex h-[calc(100vh-45px)] w-[250px] flex-col overflow-hidden bg-slate-800 px-[20px] pr-[40px] py-[20px] text-white">
+          <button
+            className="inline-flex items-center gap-2 rounded-xl bg-slate-900 px-4 py-2 text-[14px] font-medium text-white transition hover:bg-slate-800"
+            onClick={handleLogout}
+            type="button"
+          >
+            <FaSignOutAlt />
+            Logout
+          </button>
+        </div>
+      </header>
 
-      
+      <aside className="fixed left-0 top-[72px] z-40 h-[calc(100vh-72px)] w-[250px] bg-slate-900 px-4 py-5">
+        <div className="mb-6 border-b border-white/10 pb-4">
+          <p className="text-[12px] uppercase tracking-[0.16em] text-slate-400">
+            SVT Care Hub
+          </p>
+        </div>
 
-      <ul className="m-0 flex-1 list-none overflow-y-auto p-0">
-        <li className="mb-5 mt-10">
+        <nav className="flex flex-col gap-2">
           <NavLink to="/dashboard" className={linkClass}>
-            <FaCalendarAlt className="text-[20px]" />
+            <FaCalendarAlt className="text-[16px]" />
             <span>Dashboard</span>
           </NavLink>
-        </li>
 
-        {user?.role === "admin" && (
-          <>
-            <li className="mb-5">
+          {user?.role === "admin" && (
+            <>
               <NavLink to="/employees" className={linkClass}>
-                <FaUsers className="text-[20px]" />
+                <FaUsers className="text-[16px]" />
                 <span>Employees</span>
               </NavLink>
-            </li>
 
-            <li className="mb-5">
               <NavLink to="/leaves" className={linkClass}>
-                <FaClipboardList className="text-[20px]" />
+                <FaClipboardList className="text-[16px]" />
                 <span>Leave Requests</span>
               </NavLink>
-            </li>
 
-            <li className="mb-5">
               <NavLink to="/shifts" className={linkClass}>
-                <FaClock className="text-[20px]" />
+                <FaClock className="text-[16px]" />
                 <span>Shift Planner</span>
               </NavLink>
-            </li>
-          </>
-        )}
+            </>
+          )}
 
-        {user?.role === "employee" && (
-          <>
-            <li className="mb-5">
+          {user?.role === "employee" && (
+            <>
               <NavLink to="/my-schedule" className={linkClass}>
-                <FaClock className="text-[20px]" />
+                <FaClock className="text-[16px]" />
                 <span>My Schedule</span>
               </NavLink>
-            </li>
 
-            <li className="mb-5">
               <NavLink to="/apply-leave" className={linkClass}>
-                <FaClipboardList className="text-[20px]" />
+                <FaClipboardList className="text-[16px]" />
                 <span>Apply Leave</span>
               </NavLink>
-            </li>
-          </>
-        )}
-      </ul>
+            </>
+          )}
+        </nav>
 
-      <div className="mt-auto mb-0 border-t border-white/20 pb-3 pt-3 text-center text-[12px] opacity-90">
-        <p className="m-0 font-semibold">💙 Caring Beyond Medicine 💙</p>
-        <small className="mt-[3px] mb-[15px] block text-[11px] text-slate-300">
-          Healing with Compassion & Trust
-        </small>
-      </div>
-    </div>
-  </>
-);
+        <div className="absolute bottom-5 left-4 right-4 rounded-2xl border border-white/10 bg-white/5 p-4">
+          <p className="text-[13px] font-semibold text-white">
+            Hospital Workforce
+          </p>
+          <p className="mt-1 text-[11px] leading-5 text-slate-300">
+            Stay Tuned for the Latest Updates and Schedules
+          </p>
+        </div>
+      </aside>
+    </>
+  );
 }
 
 export default Sidebar;

@@ -3,7 +3,16 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
-import { FiSearch, FiPlus, FiEdit2, FiTrash2 } from "react-icons/fi";
+import {
+  FiSearch,
+  FiPlus,
+  FiEdit2,
+  FiTrash2,
+  FiX,
+  FiUsers,
+  FiMail,
+  FiBriefcase,
+} from "react-icons/fi";
 
 function Employees() {
   const navigate = useNavigate();
@@ -94,14 +103,11 @@ function Employees() {
     });
   }, [employees, search]);
 
-  const groupedEmployees = useMemo(() => {
-    return filtered.reduce((acc, emp) => {
-      const dept = emp.department?.trim() || "No Department";
-      if (!acc[dept]) acc[dept] = [];
-      acc[dept].push(emp);
-      return acc;
-    }, {});
-  }, [filtered]);
+  const totalDepartments = useMemo(() => {
+    return new Set(
+      employees.map((e) => (e.department || "").trim()).filter(Boolean)
+    ).size;
+  }, [employees]);
 
   const openAdd = () => {
     setForm({
@@ -130,7 +136,7 @@ function Employees() {
       setPop({
         open: true,
         type: "success",
-        message: "Staff/Employee created successfully ✅",
+        message: "Employee created successfully",
       });
       fetchEmployees();
     } catch (err) {
@@ -172,7 +178,7 @@ function Employees() {
       setPop({
         open: true,
         type: "success",
-        message: "Employee updated successfully ✅",
+        message: "Employee updated successfully",
       });
       fetchEmployees();
     } catch (err) {
@@ -196,7 +202,7 @@ function Employees() {
       setPop({
         open: true,
         type: "success",
-        message: "Employee deleted ✅",
+        message: "Employee deleted successfully",
       });
       fetchEmployees();
     } catch (err) {
@@ -217,11 +223,8 @@ function Employees() {
     return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
   };
 
-  const baseInputClass =
-    "h-[52px] rounded-[14px] border border-slate-300 bg-white px-4 text-[13px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-slate-900 focus:shadow-[0_0_0_4px_rgba(15,23,42,0.1)]";
-
-  const editInputClass =
-    "h-[44px] rounded-[10px] border border-slate-300 bg-white px-3 text-[14px] text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]";
+  const inputClass =
+    "h-[42px] rounded-[12px] border border-slate-300 bg-white px-3 text-[14px] text-slate-900 outline-none focus:border-slate-900 focus:shadow-[0_0_0_3px_rgba(15,23,42,0.08)]";
 
   return (
     <Layout>
@@ -232,19 +235,19 @@ function Employees() {
         onClose={() => setPop({ ...pop, open: false })}
       />
 
-      <div className="mt-[52px] h-screen overflow-hidden bg-slate-100 px-[22px] py-[18px] font-['Poppins',sans-serif]">
-        <div className="sticky top-0 z-50 flex items-center justify-between bg-slate-100 pb-[14px] pt-[25px]">
+      <div className="min-h-screen bg-slate-50 p-4 font-['Poppins',sans-serif]">
+        <div className="mb-4 flex items-center justify-between">
           <div>
-            <div className="m-0 text-[20px] font-extrabold text-slate-900">
+            <h2 className="text-[22px] font-bold text-slate-900">
               Employees
-            </div>
-            <div className="mt-1 text-[13px] text-slate-500">
-              Search and manage hospital staff
-            </div>
+            </h2>
+            <p className="mt-1 text-[13px] text-slate-500">
+              Manage all hospital staff in one place
+            </p>
           </div>
 
           <button
-            className="inline-flex h-[42px] items-center gap-2 rounded-[10px] border-none bg-slate-900 px-[14px] font-bold text-white"
+            className="inline-flex h-[42px] items-center gap-2 rounded-[12px] bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
             onClick={openAdd}
             type="button"
           >
@@ -253,369 +256,308 @@ function Employees() {
           </button>
         </div>
 
-        <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-gray-200 bg-white px-[14px] py-3 shadow-[0px_6px_18px_rgba(15,23,42,0.06)] focus-within:border-slate-900 focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]">
-          <FiSearch className="text-[18px] text-slate-500" />
+        <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-[16px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[12px] font-medium text-slate-500">
+                  Total Employees
+                </p>
+                <h3 className="mt-2 text-[26px] font-bold text-slate-900">
+                  {employees.length}
+                </h3>
+              </div>
+              <div className="rounded-[12px] bg-slate-100 p-3 text-slate-700">
+                <FiUsers size={20} />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[16px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[12px] font-medium text-slate-500">
+                  Departments
+                </p>
+                <h3 className="mt-2 text-[26px] font-bold text-slate-900">
+                  {totalDepartments}
+                </h3>
+              </div>
+              <div className="rounded-[12px] bg-slate-100 p-3 text-slate-700">
+                <FiBriefcase size={20} />
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[16px] border border-slate-200 bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[12px] font-medium text-slate-500">
+                  Today Present
+                </p>
+                <h3 className="mt-2 text-[26px] font-bold text-slate-900">
+                  {filtered.length}
+                </h3>
+              </div>
+              <div className="rounded-[12px] bg-slate-100 p-3 text-slate-700">
+                <FiMail size={20} />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-slate-200 bg-white px-4 py-3 shadow-sm">
+          <FiSearch className="text-[16px] text-slate-500" />
           <input
             className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
-            placeholder="Search staff id / name / dept / designation / email..."
+            placeholder="Search by ID, name, department, designation or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        {filtered.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-3">
-            
-          </div>
-        )}
+        <div className="overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+          <div className="overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <table className="w-full min-w-[1200px] border-collapse">
+              <thead>
+                <tr className="bg-slate-900">
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Employee
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Staff ID
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Department
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Designation
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Contact
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    DOB
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Hours
+                  </th>
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-white">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
 
-        <div className="h-[calc(100vh-190px)] overflow-auto pr-[2px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {filtered.length === 0 ? (
-            <div className="rounded-[14px] border border-dashed border-slate-300 bg-white p-4 text-center text-slate-500">
-              No employees found
-            </div>
-          ) : (
-            Object.entries(groupedEmployees).map(([department, deptEmployees]) => (
-              <div
-                key={department}
-                className="mb-6 rounded-[18px] border border-slate-200 bg-white/70 p-4 shadow-[0px_8px_24px_rgba(15,23,42,0.06)]"
-              >
-                <div className="mb-4 flex items-center justify-between rounded-[14px] bg-slate-900 px-4 py-3 text-white">
-                  <div>
-                    <div className="text-[18px] font-bold">{department}</div>
-                    <div className="text-[12px] text-slate-300">
-                      Department wise employee list
-                    </div>
-                  </div>
-
-                  <div className="rounded-full bg-white/15 px-4 py-2 text-[13px] font-semibold">
-                    {deptEmployees.length} Employee
-                    {deptEmployees.length > 1 ? "s" : ""}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {deptEmployees.map((u) => (
-                    <div
-                      key={u._id}
-                      className="grid grid-cols-1 items-start gap-[30px] rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.08)] lg:grid-cols-[140px_1fr]"
-                    >
-                      <div className="flex items-start justify-center pt-[10px]">
+              <tbody>
+                {filtered.map((u, index) => (
+                  <tr
+                    key={u._id}
+                    className={`border-t border-slate-200 transition hover:bg-slate-50 ${
+                      index % 2 !== 0 ? "bg-slate-50/60" : "bg-white"
+                    }`}
+                  >
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
                         <img
-                          className="h-[120px] w-[120px] rounded-[12px] border border-gray-200 bg-slate-100 object-cover"
+                          className="h-[46px] w-[46px] rounded-full border border-slate-200 bg-slate-100 object-cover"
                           src={`/photos/${u.employeeId}.png`}
                           onError={(e) => (e.target.src = "/default-profile.png")}
                           alt="Profile"
                         />
-                      </div>
-
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-[10px]">
-                            <div className="text-[18px] font-bold text-slate-900">
-                              {u.name}
-                            </div>
-                            <span
-                              className="inline-block h-[10px] w-[10px] rounded-full bg-green-500 shadow-[0_0_0_3px_rgba(34,197,94,0.2)]"
-                              title="Active"
-                            />
+                        <div>
+                          <div className="text-[14px] font-semibold text-slate-900">
+                            {u.name || "-"}
                           </div>
-
-                          <div className="flex gap-2">
-                            <button
-                              className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:bg-indigo-50"
-                              onClick={() => openEdit(u)}
-                              type="button"
-                            >
-                              <FiEdit2 />
-                            </button>
-
-                            <button
-                              className="grid h-[34px] w-[34px] place-items-center rounded-[10px] border border-gray-200 bg-slate-50 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700"
-                              onClick={() => removeEmployee(u._id)}
-                              type="button"
-                            >
-                              <FiTrash2 />
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-x-[18px] gap-y-5 md:grid-cols-2 xl:grid-cols-3">
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Staff ID
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.employeeId || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Staff Name
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.name || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Department
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.department || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Designation
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.designation || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Email
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.email || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Contact
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.mobile || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Gender
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.gender || "-"}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Date of Birth
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {formatDDMMYYYY(u.dob)}
-                            </div>
-                          </div>
-
-                          <div>
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Total Hours (This Week)
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
-                            </div>
-                          </div>
-
-                          <div className="md:col-span-2 xl:col-span-3">
-                            <div className="mb-1 text-[12px] font-semibold text-slate-500">
-                              Address
-                            </div>
-                            <div className="text-[14px] font-medium text-slate-900">
-                              {u.address || "-"}
-                            </div>
+                          <div className="text-[12px] text-slate-500">
+                            {u.email || "-"}
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))
-          )}
+                    </td>
+
+                    <td className="px-4 py-4 text-[14px] font-medium text-slate-800">
+                      {u.employeeId || "-"}
+                    </td>
+
+                    <td className="px-4 py-4 text-[14px] text-slate-700">
+                      {u.department || "-"}
+                    </td>
+
+                    <td className="px-4 py-4 text-[14px] text-slate-700">
+                      {u.designation || "-"}
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <div className="text-[14px] text-slate-800">
+                        {u.mobile || "-"}
+                      </div>
+                      
+                    </td>
+
+                    <td className="px-4 py-4 text-[14px] text-slate-700">
+                      {formatDDMMYYYY(u.dob)}
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-[12px] font-semibold text-slate-700">
+                        {u.totalHours ? `${u.totalHours} hrs` : "0.00 hrs"}
+                      </span>
+                    </td>
+
+                    <td className="px-4 py-4">
+                      <div className="flex items-center justify-center gap-2">
+                        <button
+                          className="grid h-[36px] w-[36px] place-items-center rounded-[10px] border border-slate-200 bg-white text-slate-700 transition hover:bg-slate-100"
+                          onClick={() => openEdit(u)}
+                          type="button"
+                        >
+                          <FiEdit2 />
+                        </button>
+
+                        <button
+                          className="grid h-[36px] w-[36px] place-items-center rounded-[10px] border border-slate-200 bg-white text-slate-700 transition hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                          onClick={() => removeEmployee(u._id)}
+                          type="button"
+                        >
+                          <FiTrash2 />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+
+                {filtered.length === 0 && (
+                  <tr>
+                    <td
+                      colSpan="8"
+                      className="px-4 py-10 text-center text-[14px] text-slate-500"
+                    >
+                      No employees found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+
 
         {addOpen && (
           <div
-            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45"
+            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45 px-4"
             onClick={() => setAddOpen(false)}
           >
             <div
-              className="w-[600px] max-w-[96vw] rounded-[18px] border border-gray-200 bg-white p-[22px]"
+              className="w-[720px] max-w-[96vw] rounded-[18px] border border-slate-200 bg-white p-5"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-3 flex items-start justify-between">
-                <h3 className="m-0 text-[20px] font-extrabold text-slate-900">
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-[18px] font-bold text-slate-900">
                   Add Employee
                 </h3>
                 <button
-                  className="h-[44px] w-[44px] rounded-[14px] border border-gray-200 bg-slate-50 text-[18px] text-slate-900 transition hover:bg-indigo-50"
+                  className="grid h-[36px] w-[36px] place-items-center rounded-[10px] border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
                   onClick={() => setAddOpen(false)}
                   type="button"
                 >
-                  ✕
+                  <FiX />
                 </button>
               </div>
 
-              <div className="mt-[10px] grid grid-cols-1 gap-x-[22px] gap-y-[18px] md:grid-cols-2">
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Staff ID
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.employeeId}
-                    onChange={(e) =>
-                      setForm({ ...form, employeeId: e.target.value })
-                    }
-                    placeholder="Enter Staff ID"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Name
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Enter Name"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Department
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.department}
-                    onChange={(e) =>
-                      setForm({ ...form, department: e.target.value })
-                    }
-                    placeholder="Enter Department"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Designation
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.designation}
-                    onChange={(e) =>
-                      setForm({ ...form, designation: e.target.value })
-                    }
-                    placeholder="Enter Designation"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Gender
-                  </label>
-                  <select
-                    className={baseInputClass}
-                    value={form.gender || ""}
-                    onChange={(e) =>
-                      setForm({ ...form, gender: e.target.value })
-                    }
-                  >
-                    <option value="">Select Gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Date of Birth
-                  </label>
-                  <input
-                    type="date"
-                    className={`${baseInputClass} text-slate-500`}
-                    value={form.dob}
-                    onChange={(e) => setForm({ ...form, dob: e.target.value })}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1 md:col-span-2">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Address
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.address}
-                    onChange={(e) =>
-                      setForm({ ...form, address: e.target.value })
-                    }
-                    placeholder="Enter Address"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Contact
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.mobile}
-                    onChange={(e) =>
-                      setForm({ ...form, mobile: e.target.value })
-                    }
-                    placeholder="Enter Contact Number"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Email
-                  </label>
-                  <input
-                    className={baseInputClass}
-                    value={form.email}
-                    onChange={(e) =>
-                      setForm({ ...form, email: e.target.value })
-                    }
-                    placeholder="Enter Email"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1">
-                  <label className="text-[13px] font-semibold text-slate-700">
-                    Password
-                  </label>
-                  <input
-                    type="password"
-                    className={baseInputClass}
-                    value={form.password}
-                    onChange={(e) =>
-                      setForm({ ...form, password: e.target.value })
-                    }
-                    placeholder="Enter Password"
-                  />
-                </div>
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                <input
+                  className={inputClass}
+                  value={form.employeeId}
+                  onChange={(e) =>
+                    setForm({ ...form, employeeId: e.target.value })
+                  }
+                  placeholder="Staff ID"
+                />
+                <input
+                  className={inputClass}
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Name"
+                />
+                <input
+                  className={inputClass}
+                  value={form.department}
+                  onChange={(e) =>
+                    setForm({ ...form, department: e.target.value })
+                  }
+                  placeholder="Department"
+                />
+                <input
+                  className={inputClass}
+                  value={form.designation}
+                  onChange={(e) =>
+                    setForm({ ...form, designation: e.target.value })
+                  }
+                  placeholder="Designation"
+                />
+                <select
+                  className={inputClass}
+                  value={form.gender || ""}
+                  onChange={(e) =>
+                    setForm({ ...form, gender: e.target.value })
+                  }
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+                <input
+                  type="date"
+                  className={inputClass}
+                  value={form.dob}
+                  onChange={(e) => setForm({ ...form, dob: e.target.value })}
+                />
+                <input
+                  className={`${inputClass} md:col-span-2`}
+                  value={form.address}
+                  onChange={(e) =>
+                    setForm({ ...form, address: e.target.value })
+                  }
+                  placeholder="Address"
+                />
+                <input
+                  className={inputClass}
+                  value={form.mobile}
+                  onChange={(e) =>
+                    setForm({ ...form, mobile: e.target.value })
+                  }
+                  placeholder="Mobile Number"
+                />
+                <input
+                  className={inputClass}
+                  value={form.email}
+                  onChange={(e) =>
+                    setForm({ ...form, email: e.target.value })
+                  }
+                  placeholder="Email"
+                />
+                <input
+                  type="password"
+                  className={`${inputClass} md:col-span-2`}
+                  value={form.password}
+                  onChange={(e) =>
+                    setForm({ ...form, password: e.target.value })
+                  }
+                  placeholder="Password"
+                />
               </div>
 
-              <div className="mt-3 flex justify-end gap-[10px]">
+              <div className="mt-4 flex justify-end gap-[10px]">
                 <button
-                  className="h-[44px] rounded-[10px] bg-slate-900 px-[14px] font-bold text-white"
+                  className="h-[42px] rounded-[12px] bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
                   onClick={addEmployee}
                   type="button"
                 >
                   Create
                 </button>
-
                 <button
-                  className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
+                  className="h-[42px] rounded-[12px] bg-slate-300 px-4 text-sm font-semibold text-slate-800 hover:bg-slate-400"
                   onClick={() => setAddOpen(false)}
                   type="button"
                 >
@@ -628,56 +570,61 @@ function Employees() {
 
         {editing && (
           <div
-            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45"
+            className="fixed inset-0 z-[1500] flex items-center justify-center bg-slate-950/45 px-4"
             onClick={() => setEditing(null)}
           >
             <div
-              className="w-[680px] max-w-[94vw] rounded-[14px] border border-gray-200 bg-white p-4"
+              className="w-[720px] max-w-[96vw] rounded-[18px] border border-slate-200 bg-white p-5"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-[10px] text-[16px] font-extrabold text-slate-800">
-                Edit Employee
+              <div className="mb-4 flex items-center justify-between">
+                <h3 className="text-[18px] font-bold text-slate-900">
+                  Edit Employee
+                </h3>
+                <button
+                  className="grid h-[36px] w-[36px] place-items-center rounded-[10px] border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100"
+                  onClick={() => setEditing(null)}
+                  type="button"
+                >
+                  <FiX />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 gap-[10px] md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Staff ID"
                   value={editForm.employeeId}
                   onChange={(e) =>
                     setEditForm({ ...editForm, employeeId: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Name"
                   value={editForm.name}
                   onChange={(e) =>
                     setEditForm({ ...editForm, name: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Department"
                   value={editForm.department}
                   onChange={(e) =>
                     setEditForm({ ...editForm, department: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Designation"
                   value={editForm.designation}
                   onChange={(e) =>
                     setEditForm({ ...editForm, designation: e.target.value })
                   }
                 />
-
                 <select
-                  className={`${editInputClass} text-slate-500`}
+                  className={inputClass}
                   value={editForm.gender}
                   onChange={(e) =>
                     setEditForm({ ...editForm, gender: e.target.value })
@@ -688,37 +635,33 @@ function Employees() {
                   <option value="Female">Female</option>
                   <option value="Other">Other</option>
                 </select>
-
                 <input
                   type="date"
-                  className={`${editInputClass} text-slate-500`}
+                  className={inputClass}
                   value={editForm.dob}
                   onChange={(e) =>
                     setEditForm({ ...editForm, dob: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Address"
                   value={editForm.address}
                   onChange={(e) =>
                     setEditForm({ ...editForm, address: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
+                  className={inputClass}
                   placeholder="Contact"
                   value={editForm.mobile}
                   onChange={(e) =>
                     setEditForm({ ...editForm, mobile: e.target.value })
                   }
                 />
-
                 <input
-                  className={editInputClass}
-                  placeholder="Mail"
+                  className={`${inputClass} md:col-span-2`}
+                  placeholder="Email"
                   value={editForm.email}
                   onChange={(e) =>
                     setEditForm({ ...editForm, email: e.target.value })
@@ -726,17 +669,16 @@ function Employees() {
                 />
               </div>
 
-              <div className="mt-3 flex justify-end gap-[10px]">
+              <div className="mt-4 flex justify-end gap-[10px]">
                 <button
-                  className="h-[44px] rounded-[10px] bg-slate-900 px-[14px] font-bold text-white"
+                  className="h-[42px] rounded-[12px] bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
                   onClick={saveEdit}
                   type="button"
                 >
                   Save
                 </button>
-
                 <button
-                  className="h-[44px] rounded-[10px] bg-slate-400 px-[14px] font-bold text-white"
+                  className="h-[42px] rounded-[12px] bg-slate-300 px-4 text-sm font-semibold text-slate-800 hover:bg-slate-400"
                   onClick={() => setEditing(null)}
                   type="button"
                 >

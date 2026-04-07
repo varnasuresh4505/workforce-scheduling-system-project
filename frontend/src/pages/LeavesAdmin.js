@@ -2,11 +2,13 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
+import Popup from "../components/Popup";
 import { FiSearch } from "react-icons/fi";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
 const formatDDMMYYYY = (dateValue) => {
+  if (!dateValue) return "-";
   const d = new Date(dateValue);
   return `${pad2(d.getDate())}-${pad2(d.getMonth() + 1)}-${d.getFullYear()}`;
 };
@@ -21,21 +23,51 @@ const formatTimeAMPM = (time) => {
   const h = parseInt(hh, 10);
   const ampm = h >= 12 ? "PM" : "AM";
   const hour12 = h % 12 || 12;
+
   return `${pad2(hour12)}:${mm} ${ampm}`;
 };
 
 const getStatusClass = (status) => {
   const s = String(status || "").toLowerCase();
 
-  if (s === "approved") {
-    return "bg-green-100 text-green-700";
-  }
-
-  if (s === "rejected") {
-    return "bg-red-100 text-red-700";
-  }
-
+  if (s === "approved") return "bg-green-100 text-green-700";
+  if (s === "rejected") return "bg-red-100 text-red-700";
   return "bg-orange-100 text-orange-700";
+};
+
+const toMinutes = (time) => {
+  if (!time) return 0;
+  const t = String(time).trim();
+
+  if (/am|pm/i.test(t)) {
+    const clean = t.toUpperCase().replace(/\s+/g, " ");
+    const [timePart, meridiem] = clean.split(" ");
+    let [hh, mm = "00"] = timePart.split(":").map(Number);
+
+    if (meridiem === "PM" && hh !== 12) hh += 12;
+    if (meridiem === "AM" && hh === 12) hh = 0;
+
+    return hh * 60 + mm;
+  }
+
+  const [hh, mm = "00"] = t.split(":").map(Number);
+  return hh * 60 + mm;
+};
+
+const isPastLeave = (leave) => {
+  if (!leave?.toDate) return false;
+
+  const endDate = new Date(leave.toDate);
+  const now = new Date();
+
+  if (leave.endTime) {
+    const mins = toMinutes(leave.endTime);
+    endDate.setHours(Math.floor(mins / 60), mins % 60, 59, 999);
+  } else {
+    endDate.setHours(23, 59, 59, 999);
+  }
+
+  return endDate < now;
 };
 
 function LeavesAdmin() {
@@ -44,6 +76,11 @@ function LeavesAdmin() {
 
   const [leaves, setLeaves] = useState([]);
   const [search, setSearch] = useState("");
+  const [pop, setPop] = useState({
+    open: false,
+    type: "success",
+    message: "",
+  });
 
   useEffect(() => {
     if (!user) return navigate("/");
@@ -58,22 +95,46 @@ function LeavesAdmin() {
       const res = await axios.get("http://localhost:5000/api/leaves", {
         headers: { Authorization: `Bearer ${user.token}` },
       });
-      setLeaves(res.data || []);
+      setLeaves(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to fetch leaves");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to fetch leaves",
+      });
     }
   };
 
-  const updateStatus = async (id, status) => {
+  const updateStatus = async (leaveObj, status) => {
+    if (isPastLeave(leaveObj)) {
+      setPop({
+        open: true,
+        type: "error",
+        message: "You cannot approve or reject a leave request for past leave dates",
+      });
+      return;
+    }
+
     try {
       await axios.put(
-        `http://localhost:5000/api/leaves/${id}`,
+        `http://localhost:5000/api/leaves/${leaveObj._id}`,
         { status },
         { headers: { Authorization: `Bearer ${user.token}` } }
       );
+
+      setPop({
+        open: true,
+        type: "success",
+        message: `Leave ${status} successfully`,
+      });
+
       fetchLeaves();
     } catch (err) {
-      alert(err.response?.data?.message || "Failed to update status");
+      setPop({
+        open: true,
+        type: "error",
+        message: err.response?.data?.message || "Failed to update status",
+      });
     }
   };
 
@@ -102,161 +163,178 @@ function LeavesAdmin() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-slate-100 p-[26px] font-['Poppins',sans-serif] max-[900px]:p-[18px]">
-        <div className="mb-[14px]">
-          
+      <Popup
+        open={pop.open}
+        type={pop.type}
+        message={pop.message}
+        onClose={() => setPop({ ...pop, open: false })}
+      />
 
-          <div className="mb-4 flex items-center gap-[10px] rounded-[14px] border border-gray-200 bg-white px-[14px] py-3 shadow-[0px_6px_18px_rgba(15,23,42,0.06)] focus-within:border-slate-900 focus-within:shadow-[0_0_0_3px_rgba(15,23,42,0.12)]">
-                  <FiSearch className="text-[18px] text-slate-500" />
-                  <input
-                    className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
-                    placeholder="Search staff id / name / dept / designation / email..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-        </div>
-
-        <div className="rounded-[14px] border border-gray-200 bg-white p-[18px] shadow-[0px_6px_18px_rgba(15,23,42,0.06)]">
-          <div className="mb-[10px] flex items-center justify-between">
-            <h3 className="m-0 text-[16px] font-semibold text-slate-900">
-              Leave Request List
-            </h3>
-            <span className="rounded-full bg-slate-100 px-[10px] py-[6px] text-[12px] text-slate-500">
-              {tableRows.length} Records
-            </span>
+      <div className="min-h-screen bg-slate-50 p-4 font-['Poppins',sans-serif] md:p-5">
+        <div className="mb-3 flex items-end justify-between">
+          <div>
+            <h2 className="text-[20px] font-bold text-slate-900">
+              Leave Requests
+            </h2>
+            <p className="mt-1 text-[13px] text-slate-500">
+              Review and update employee leave status
+            </p>
           </div>
 
-          <div className="max-h-[540px] overflow-y-auto rounded-[12px] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <table className="min-w-[900px] w-full border-collapse">
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-medium text-slate-600">
+            {tableRows.length} Records
+          </span>
+        </div>
+
+        <div className="mb-4 flex items-center gap-[10px] rounded-[16px] border border-slate-200 bg-white px-4 py-3 shadow-[0_8px_24px_rgba(15,23,42,0.04)]">
+          <FiSearch className="text-[16px] text-slate-500" />
+          <input
+            className="w-full border-none bg-transparent text-[14px] text-slate-900 outline-none"
+            placeholder="Search by employee id, name, email, reason or status..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+
+        <div className="overflow-hidden rounded-[20px] border border-slate-200 bg-white shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+          <div className="overflow-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <table className="w-full min-w-[1200px] border-collapse">
               <thead>
-                <tr>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
-                    Emp ID
-                  </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                <tr className="bg-slate-900">
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
                     Employee
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
-                    From Date
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    Staff ID
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
-                    To Date
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    From
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
+                    To
+                  </th>
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
                     Time
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
                     Reason
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
+                  <th className="px-4 py-4 text-left text-[13px] font-semibold text-white">
                     Status
                   </th>
-                  <th className="sticky top-0 z-[5] bg-slate-900 px-3 py-3 text-left text-[13px] font-semibold text-white">
-                    Action
+                  <th className="px-4 py-4 text-center text-[13px] font-semibold text-white">
+                    Actions
                   </th>
                 </tr>
               </thead>
 
               <tbody>
-                {tableRows.map((l, index) => (
-                  <tr key={l._id}>
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      {l.employee?.employeeId || "-"}
-                    </td>
+                {tableRows.map((l, index) => {
+                  const pastLeave = isPastLeave(l);
+                  const alreadyFinal =
+                    String(l.status || "").toLowerCase() === "approved" ||
+                    String(l.status || "").toLowerCase() === "rejected";
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
+                  return (
+                    <tr
+                      key={l._id}
+                      className={`border-t border-slate-200 transition hover:bg-slate-50 ${
+                        index % 2 !== 0 ? "bg-slate-50/60" : "bg-white"
                       }`}
                     >
-                      {l.employee?.name || "-"}
-                      <br />
-                      <small className="text-gray-500">
-                        {l.employee?.email || ""}
-                      </small>
-                    </td>
+                      <td className="px-4 py-4">
+                        <div className="text-[14px] font-semibold text-slate-900">
+                          {l.employee?.name || "-"}
+                        </div>
+                        <div className="text-[12px] text-slate-500">
+                          {l.employee?.email || "-"}
+                        </div>
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      {formatDDMMYYYY(l.fromDate)}
-                    </td>
+                      <td className="px-4 py-4 text-[14px] font-medium text-slate-800">
+                        {l.employee?.employeeId || "-"}
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      {formatDDMMYYYY(l.toDate)}
-                    </td>
+                      <td className="px-4 py-4 text-[14px] text-slate-700">
+                        {formatDDMMYYYY(l.fromDate)}
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      {formatTimeAMPM(l.startTime)} - {formatTimeAMPM(l.endTime)}
-                    </td>
+                      <td className="px-4 py-4 text-[14px] text-slate-700">
+                        {formatDDMMYYYY(l.toDate)}
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      {l.reason || "-"}
-                    </td>
+                      <td className="px-4 py-4 text-[14px] text-slate-700">
+                        {formatTimeAMPM(l.startTime)} - {formatTimeAMPM(l.endTime)}
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      <span
-                        className={`inline-block rounded-full px-[10px] py-[6px] text-[12px] font-bold capitalize ${getStatusClass(
-                          l.status
-                        )}`}
-                      >
-                        {l.status}
-                      </span>
-                    </td>
+                      <td className="max-w-[280px] px-4 py-4 text-[14px] text-slate-700">
+                        {l.reason || "-"}
+                      </td>
 
-                    <td
-                      className={`border border-gray-200 px-3 py-3 align-top text-[15px] text-slate-900 ${
-                        index % 2 !== 0 ? "bg-slate-50" : "bg-white"
-                      }`}
-                    >
-                      <div className="flex items-center gap-[10px]">
-                        <button
-                          className="rounded-[10px] bg-green-600 px-3 py-[7px] font-semibold text-white transition hover:brightness-95"
-                          onClick={() => updateStatus(l._id, "approved")}
-                          type="button"
+                      <td className="px-4 py-4">
+                        <span
+                          className={`rounded-full px-3 py-1 text-[12px] font-semibold capitalize ${getStatusClass(
+                            l.status
+                          )}`}
                         >
-                          Approve
-                        </button>
-                        <button
-                          className="rounded-[10px] bg-red-600 px-3 py-[7px] font-semibold text-white transition hover:brightness-95"
-                          onClick={() => updateStatus(l._id, "rejected")}
-                          type="button"
-                        >
-                          Reject
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                          {l.status}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-4">
+                        <div className="flex items-center justify-center gap-2">
+                          <button
+                            className={`rounded-[10px] px-3 py-2 text-[13px] font-semibold text-white transition ${
+                              pastLeave || alreadyFinal
+                                ? "cursor-not-allowed bg-green-300"
+                                : "bg-green-600 hover:bg-green-700"
+                            }`}
+                            onClick={() => updateStatus(l, "approved")}
+                            type="button"
+                            disabled={pastLeave || alreadyFinal}
+                            title={
+                              pastLeave
+                                ? "Cannot approve past leave"
+                                : alreadyFinal
+                                ? "Status already updated"
+                                : "Approve leave"
+                            }
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            className={`rounded-[10px] px-3 py-2 text-[13px] font-semibold text-white transition ${
+                              pastLeave || alreadyFinal
+                                ? "cursor-not-allowed bg-red-300"
+                                : "bg-red-600 hover:bg-red-700"
+                            }`}
+                            onClick={() => updateStatus(l, "rejected")}
+                            type="button"
+                            disabled={pastLeave || alreadyFinal}
+                            title={
+                              pastLeave
+                                ? "Cannot reject past leave"
+                                : alreadyFinal
+                                ? "Status already updated"
+                                : "Reject leave"
+                            }
+                          >
+                            Reject
+                          </button>
+                        </div>
+
+                       
+                      </td>
+                    </tr>
+                  );
+                })}
 
                 {tableRows.length === 0 && (
                   <tr>
                     <td
                       colSpan="8"
-                      className="px-[18px] py-[18px] text-center text-slate-500"
+                      className="px-4 py-10 text-center text-[14px] text-slate-500"
                     >
                       No leave requests found
                     </td>
