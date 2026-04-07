@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
+import { API_BASE_URL } from "../services/api";
 import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const startOfWeek = (date) => {
@@ -85,7 +86,7 @@ function ShiftsPlanner() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employees", {
+      const res = await axios.get(`${API_BASE_URL}/employees`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setEmployees(Array.isArray(res.data) ? res.data : []);
@@ -100,7 +101,7 @@ function ShiftsPlanner() {
 
   const fetchShifts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/schedules", {
+      const res = await axios.get(`${API_BASE_URL}/schedules`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setShifts(Array.isArray(res.data) ? res.data : []);
@@ -116,7 +117,7 @@ function ShiftsPlanner() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves", {
+      const res = await axios.get(`${API_BASE_URL}/leaves`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setLeaves(Array.isArray(res.data) ? res.data : []);
@@ -189,7 +190,7 @@ function ShiftsPlanner() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/schedules",
+        `${API_BASE_URL}/schedules`,
         {
           employeeId: selectedEmp.employeeId,
           date: selectedDate,

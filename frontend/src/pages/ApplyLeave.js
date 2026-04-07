@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
+import { API_BASE_URL } from "../services/api";
 
 const getStatusClass = (status) => {
   if (status === "approved") return "bg-green-100 text-green-700";
@@ -38,7 +39,7 @@ function ApplyLeave() {
 
   const fetchMyLeaves = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves/my", {
+      const res = await axios.get(`${API_BASE_URL}/leaves/my`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setMyLeaves(Array.isArray(res.data) ? res.data : []);
@@ -141,7 +142,7 @@ function ApplyLeave() {
     }
 
     try {
-      await axios.post("http://localhost:5000/api/leaves", form, {
+      await axios.post(`${API_BASE_URL}/leaves`, form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Popup from "../components/Popup";
+import { API_BASE_URL } from "../services/api";
 import {
   FiPlus,
   FiX,
@@ -105,7 +106,7 @@ function Schedules() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/employees", {
+      const res = await axios.get(`${API_BASE_URL}/employees`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setEmployees(Array.isArray(res.data) ? res.data : []);
@@ -120,7 +121,7 @@ function Schedules() {
 
   const fetchSchedules = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/schedules", {
+      const res = await axios.get(`${API_BASE_URL}/schedules`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setSchedules(Array.isArray(res.data) ? res.data : []);
@@ -135,7 +136,7 @@ function Schedules() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves", {
+      const res = await axios.get(`${API_BASE_URL}/leaves`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setLeaves(Array.isArray(res.data) ? res.data : []);
@@ -299,7 +300,7 @@ function Schedules() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/schedules",
+        `${API_BASE_URL}/schedules`,
         {
           employeeId: form.employeeId,
           date: form.date,

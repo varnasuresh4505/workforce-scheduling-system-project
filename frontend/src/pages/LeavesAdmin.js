@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
 import { FiSearch } from "react-icons/fi";
+import { API_BASE_URL } from "../services/api";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
@@ -92,7 +93,7 @@ function LeavesAdmin() {
 
   const fetchLeaves = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/leaves", {
+      const res = await axios.get(`${API_BASE_URL}/leaves`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       setLeaves(Array.isArray(res.data) ? res.data : []);
@@ -116,11 +117,9 @@ function LeavesAdmin() {
     }
 
     try {
-      await axios.put(
-        `http://localhost:5000/api/leaves/${leaveObj._id}`,
-        { status },
-        { headers: { Authorization: `Bearer ${user.token}` } }
-      );
+      await axios.put(`${API_BASE_URL}/leaves/${leaveObj._id}`, { status }, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
 
       setPop({
         open: true,

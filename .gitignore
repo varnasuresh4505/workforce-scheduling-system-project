@@ -1,0 +1,7 @@
+# Local environment files must never be committed
+backend/.env
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
 import Schedules from "./Schedules";
+import { API_BASE_URL } from "../services/api";
 import {
   FiClock,
   FiUser,
@@ -98,7 +99,7 @@ function Dashboard() {
 
   const fetchAdmin = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard/stats", {
+      const res = await axios.get(`${API_BASE_URL}/dashboard/stats`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
@@ -122,7 +123,7 @@ function Dashboard() {
 
   const fetchEmployee = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/dashboard/me", {
+      const res = await axios.get(`${API_BASE_URL}/dashboard/me`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 

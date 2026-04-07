@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
+import { API_BASE_URL } from "../services/api";
 import {
   FiSearch,
   FiPlus,
@@ -72,12 +73,9 @@ function Employees() {
 
   const fetchEmployees = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/employees/with-hours",
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
+      const res = await axios.get(`${API_BASE_URL}/employees/with-hours`, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
       setEmployees(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setPop({
@@ -128,7 +126,7 @@ function Employees() {
 
   const addEmployee = async () => {
     try {
-      await axios.post("http://localhost:5000/api/employees", form, {
+      await axios.post(`${API_BASE_URL}/employees`, form, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
@@ -166,13 +164,9 @@ function Employees() {
 
   const saveEdit = async () => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/employees/${editing._id}`,
-        editForm,
-        {
-          headers: { Authorization: `Bearer ${user.token}` },
-        }
-      );
+      await axios.put(`${API_BASE_URL}/employees/${editing._id}`, editForm, {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
 
       setEditing(null);
       setPop({
@@ -195,7 +189,7 @@ function Employees() {
     if (!ok) return;
 
     try {
-      await axios.delete(`http://localhost:5000/api/employees/${id}`, {
+      await axios.delete(`${API_BASE_URL}/employees/${id}`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import Popup from "../components/Popup";
+import { API_BASE_URL } from "../services/api";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
@@ -70,7 +71,7 @@ function MySchedule() {
 
   const fetchMySchedules = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/schedules/my", {
+      const res = await axios.get(`${API_BASE_URL}/schedules/my`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
