@@ -17,7 +17,6 @@ import {
   FiUsers,
 } from "react-icons/fi";
 import { BsGenderAmbiguous } from "react-icons/bs";
-import { HiOutlineSparkles } from "react-icons/hi2";
 
 const pad2 = (n) => String(n).padStart(2, "0");
 
@@ -57,13 +56,6 @@ function Dashboard() {
     message: "",
   });
 
-  const [adminData, setAdminData] = useState({
-    totalEmployees: 0,
-    todayPresent: 0,
-    todayShifts: 0,
-    latestSchedules: [],
-  });
-
   const [empData, setEmpData] = useState({
     user: null,
     totalHours: "0.00",
@@ -90,34 +82,8 @@ function Dashboard() {
   const loadDashboard = async () => {
     if (!user) return;
 
-    if (user.role === "admin") {
-      await fetchAdmin();
-    } else {
+    if (user.role !== "admin") {
       await fetchEmployee();
-    }
-  };
-
-  const fetchAdmin = async () => {
-    try {
-      const res = await axios.get(`${API_BASE_URL}/dashboard/stats`, {
-        headers: { Authorization: `Bearer ${user.token}` },
-      });
-
-      setAdminData({
-        totalEmployees: res.data?.totalEmployees || 0,
-        todayPresent: res.data?.todayPresent || 0,
-        todayShifts: res.data?.todayShifts || 0,
-        latestSchedules: Array.isArray(res.data?.latestSchedules)
-          ? res.data.latestSchedules
-          : [],
-      });
-    } catch (err) {
-      console.error(err);
-      setPop({
-        open: true,
-        type: "error",
-        message: "Failed to load admin dashboard",
-      });
     }
   };
 

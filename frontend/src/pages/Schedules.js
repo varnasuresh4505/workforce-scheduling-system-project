@@ -7,9 +7,6 @@ import {
   FiPlus,
   FiX,
   FiSearch,
-  FiUsers,
-  FiCheckCircle,
-  FiCalendar,
 } from "react-icons/fi";
 
 const formatDateDDMMYYYY = (dateStr) => {
@@ -73,12 +70,6 @@ function Schedules() {
     message: "",
   });
 
-  const [stats, setStats] = useState({
-    totalEmployees: 0,
-    todayPresent: 0,
-    todayShifts: 0,
-  });
-
   const [form, setForm] = useState({
     employeeId: "",
     employeeName: "",
@@ -98,11 +89,6 @@ function Schedules() {
     fetchLeaves();
     // eslint-disable-next-line
   }, []);
-
-  useEffect(() => {
-    computeStats();
-    // eslint-disable-next-line
-  }, [employees, schedules, leaves]);
 
   const fetchEmployees = async () => {
     try {
@@ -142,62 +128,6 @@ function Schedules() {
       setLeaves(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       setLeaves([]);
-    }
-  };
-
-  const computeStats = async () => {
-    try {
-      const totalEmployees = employees.length;
-
-      const today = new Date();
-      const y = today.getFullYear();
-      const m = String(today.getMonth() + 1).padStart(2, "0");
-      const d = String(today.getDate()).padStart(2, "0");
-      const todayKey = `${y}-${m}-${d}`;
-
-      const todaySchedules = schedules.filter((s) => {
-        const sd = new Date(s.date);
-        const yy = sd.getFullYear();
-        const mm = String(sd.getMonth() + 1).padStart(2, "0");
-        const dd = String(sd.getDate()).padStart(2, "0");
-        return `${yy}-${mm}-${dd}` === todayKey;
-      });
-
-      const todayShifts = todaySchedules.length;
-      let todayPresent = totalEmployees;
-
-      try {
-        const approvedToday = leaves.filter((lv) => {
-          const status = String(lv.status || "").toLowerCase();
-          if (status !== "approved") return false;
-
-          const from = new Date(lv.fromDate);
-          const to = new Date(lv.toDate);
-
-          from.setHours(0, 0, 0, 0);
-          to.setHours(23, 59, 59, 999);
-
-          const t = new Date(today);
-          t.setHours(12, 0, 0, 0);
-
-          return t >= from && t <= to;
-        });
-
-        const leaveEmpSet = new Set(
-          approvedToday
-            .map((lv) => lv.employee?._id || lv.employee)
-            .filter(Boolean)
-            .map(String)
-        );
-
-        todayPresent = Math.max(0, totalEmployees - leaveEmpSet.size);
-      } catch {
-        // ignore
-      }
-
-      setStats({ totalEmployees, todayPresent, todayShifts });
-    } catch {
-      // ignore
     }
   };
 

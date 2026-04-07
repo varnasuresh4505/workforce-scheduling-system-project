@@ -210,6 +210,11 @@ function Employees() {
 
   const pad2 = (n) => String(n).padStart(2, "0");
 
+  const handleDigitsOnlyChange = (setter, field) => (e) => {
+    const digitsOnly = e.target.value.replace(/\D/g, "");
+    setter((prev) => ({ ...prev, [field]: digitsOnly }));
+  };
+
   const formatDDMMYYYY = (dateValue) => {
     if (!dateValue) return "-";
     const d = new Date(dateValue);
@@ -502,9 +507,18 @@ function Employees() {
                   <option value="Other">Other</option>
                 </select>
                 <input
-                  type="date"
+                  type={form.dob ? "date" : "text"}
                   className={inputClass}
+                  placeholder="Select Date"
                   value={form.dob}
+                  onFocus={(e) => {
+                    e.target.type = "date";
+                  }}
+                  onBlur={(e) => {
+                    if (!form.dob) {
+                      e.target.type = "text";
+                    }
+                  }}
                   onChange={(e) => setForm({ ...form, dob: e.target.value })}
                 />
                 <input
@@ -518,9 +532,10 @@ function Employees() {
                 <input
                   className={inputClass}
                   value={form.mobile}
-                  onChange={(e) =>
-                    setForm({ ...form, mobile: e.target.value })
-                  }
+                  inputMode="numeric"
+                  maxLength={10}
+                  pattern="[0-9]*"
+                  onChange={handleDigitsOnlyChange(setForm, "mobile")}
                   placeholder="Mobile Number"
                 />
                 <input
@@ -630,9 +645,18 @@ function Employees() {
                   <option value="Other">Other</option>
                 </select>
                 <input
-                  type="date"
+                  type={editForm.dob ? "date" : "text"}
                   className={inputClass}
+                  placeholder="Select Date"
                   value={editForm.dob}
+                  onFocus={(e) => {
+                    e.target.type = "date";
+                  }}
+                  onBlur={(e) => {
+                    if (!editForm.dob) {
+                      e.target.type = "text";
+                    }
+                  }}
                   onChange={(e) =>
                     setEditForm({ ...editForm, dob: e.target.value })
                   }
@@ -649,9 +673,10 @@ function Employees() {
                   className={inputClass}
                   placeholder="Contact"
                   value={editForm.mobile}
-                  onChange={(e) =>
-                    setEditForm({ ...editForm, mobile: e.target.value })
-                  }
+                  inputMode="numeric"
+                  maxLength={10}
+                  pattern="[0-9]*"
+                  onChange={handleDigitsOnlyChange(setEditForm, "mobile")}
                 />
                 <input
                   className={`${inputClass} md:col-span-2`}
